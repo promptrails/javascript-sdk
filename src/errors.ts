@@ -18,35 +18,55 @@ export class PromptRailsError extends Error {
 }
 
 export class ValidationError extends PromptRailsError {
-  constructor(message: string, code?: string, details?: Record<string, unknown>) {
+  constructor(
+    message: string,
+    code?: string,
+    details?: Record<string, unknown>,
+  ) {
     super(message, 400, code, details);
     this.name = "ValidationError";
   }
 }
 
 export class UnauthorizedError extends PromptRailsError {
-  constructor(message: string, code?: string, details?: Record<string, unknown>) {
+  constructor(
+    message: string,
+    code?: string,
+    details?: Record<string, unknown>,
+  ) {
     super(message, 401, code, details);
     this.name = "UnauthorizedError";
   }
 }
 
 export class ForbiddenError extends PromptRailsError {
-  constructor(message: string, code?: string, details?: Record<string, unknown>) {
+  constructor(
+    message: string,
+    code?: string,
+    details?: Record<string, unknown>,
+  ) {
     super(message, 403, code, details);
     this.name = "ForbiddenError";
   }
 }
 
 export class NotFoundError extends PromptRailsError {
-  constructor(message: string, code?: string, details?: Record<string, unknown>) {
+  constructor(
+    message: string,
+    code?: string,
+    details?: Record<string, unknown>,
+  ) {
     super(message, 404, code, details);
     this.name = "NotFoundError";
   }
 }
 
 export class RateLimitError extends PromptRailsError {
-  constructor(message: string, code?: string, details?: Record<string, unknown>) {
+  constructor(
+    message: string,
+    code?: string,
+    details?: Record<string, unknown>,
+  ) {
     super(message, 429, code, details);
     this.name = "RateLimitError";
   }
@@ -66,7 +86,11 @@ export class ServerError extends PromptRailsError {
 
 const STATUS_MAP: Record<
   number,
-  new (message: string, code?: string, details?: Record<string, unknown>) => PromptRailsError
+  new (
+    message: string,
+    code?: string,
+    details?: Record<string, unknown>,
+  ) => PromptRailsError
 > = {
   400: ValidationError,
   401: UnauthorizedError,
@@ -75,7 +99,10 @@ const STATUS_MAP: Record<
   429: RateLimitError,
 };
 
-export function raiseForStatus(statusCode: number, body: Record<string, unknown>): void {
+export function raiseForStatus(
+  statusCode: number,
+  body: Record<string, unknown>,
+): void {
   if (statusCode >= 200 && statusCode < 300) return;
 
   const errorData = body.error as

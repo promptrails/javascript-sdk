@@ -10,7 +10,9 @@ import {
 import { BaseResource } from "./base";
 
 export class ChatResource extends BaseResource {
-  async listSessions(params?: ListParams): Promise<PaginatedResponse<ChatSession>> {
+  async listSessions(
+    params?: ListParams,
+  ): Promise<PaginatedResponse<ChatSession>> {
     const body = await this.http.get("/api/v1/chat/sessions", {
       page: params?.page ?? 1,
       limit: params?.limit ?? 20,
@@ -39,14 +41,20 @@ export class ChatResource extends BaseResource {
     sessionId: string,
     params?: ListParams,
   ): Promise<PaginatedResponse<ChatMessage>> {
-    const body = await this.http.get(`/api/v1/chat/sessions/${sessionId}/messages`, {
-      page: params?.page ?? 1,
-      limit: params?.limit ?? 20,
-    });
+    const body = await this.http.get(
+      `/api/v1/chat/sessions/${sessionId}/messages`,
+      {
+        page: params?.page ?? 1,
+        limit: params?.limit ?? 20,
+      },
+    );
     return parsePaginatedResponse<ChatMessage>(body);
   }
 
-  async sendMessage(sessionId: string, data: SendMessageRequest): Promise<ChatMessage> {
+  async sendMessage(
+    sessionId: string,
+    data: SendMessageRequest,
+  ): Promise<ChatMessage> {
     const body = await this.http.post(
       `/api/v1/chat/sessions/${sessionId}/messages`,
       data as unknown as Record<string, unknown>,

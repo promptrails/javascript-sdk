@@ -21,7 +21,10 @@ export class ApprovalsResource extends BaseResource {
     return this.unwrap(body) as ApprovalRequest;
   }
 
-  async decide(approvalId: string, data: DecideApprovalRequest): Promise<ApprovalRequest> {
+  async decide(
+    approvalId: string,
+    data: DecideApprovalRequest,
+  ): Promise<ApprovalRequest> {
     const body = await this.http.post(
       `/api/v1/approvals/${approvalId}/decide`,
       data as unknown as Record<string, unknown>,

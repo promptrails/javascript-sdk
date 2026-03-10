@@ -67,17 +67,21 @@ describe("raiseForStatus", () => {
   });
 
   it("should throw UnauthorizedError on 401", () => {
-    expect(() => raiseForStatus(401, { error: "unauthorized" })).toThrow(UnauthorizedError);
+    expect(() => raiseForStatus(401, { error: "unauthorized" })).toThrow(
+      UnauthorizedError,
+    );
   });
 
   it("should throw NotFoundError on 404", () => {
-    expect(() => raiseForStatus(404, { error: { message: "not found" } })).toThrow(NotFoundError);
+    expect(() =>
+      raiseForStatus(404, { error: { message: "not found" } }),
+    ).toThrow(NotFoundError);
   });
 
   it("should throw RateLimitError on 429", () => {
-    expect(() => raiseForStatus(429, { error: { message: "rate limited" } })).toThrow(
-      RateLimitError,
-    );
+    expect(() =>
+      raiseForStatus(429, { error: { message: "rate limited" } }),
+    ).toThrow(RateLimitError);
   });
 
   it("should include error details", () => {

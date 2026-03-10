@@ -15,7 +15,10 @@ export interface ClientOptions {
 export function resolveConfig(options: ClientOptions): Config {
   return {
     apiKey: options.apiKey,
-    baseUrl: (options.baseUrl || "https://api.promptrails.ai").replace(/\/$/, ""),
+    baseUrl: (options.baseUrl || "https://api.promptrails.ai").replace(
+      /\/$/,
+      "",
+    ),
     timeout: options.timeout ?? 30000,
     maxRetries: options.maxRetries ?? 3,
   };

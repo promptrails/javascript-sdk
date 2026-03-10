@@ -52,7 +52,10 @@ export class MCPToolsResource extends BaseResource {
   }
 
   /** Execute a tool call with the provided arguments. */
-  async callTool(toolId: string, data: CallMCPToolRequest): Promise<MCPCallToolResult> {
+  async callTool(
+    toolId: string,
+    data: CallMCPToolRequest,
+  ): Promise<MCPCallToolResult> {
     const body = await this.http.post(
       `/api/v1/mcp-tools/${toolId}/call`,
       data as unknown as Record<string, unknown>,

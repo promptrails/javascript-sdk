@@ -628,10 +628,30 @@ export interface DashboardMetrics {
   };
   executions_by_day: { date: string; count: number }[];
   cost_by_day: { date: string; cost: number }[];
-  agent_usage: { agent_id: string; agent_name: string; executions: number; total_cost: number }[];
-  model_usage: { model_name: string; count: number; total_cost: number; total_tokens: number }[];
-  error_rate: { date: string; total: number; errors: number; error_rate: number }[];
-  score_trends: { date: string; name: string; average: number; count: number }[];
+  agent_usage: {
+    agent_id: string;
+    agent_name: string;
+    executions: number;
+    total_cost: number;
+  }[];
+  model_usage: {
+    model_name: string;
+    count: number;
+    total_cost: number;
+    total_tokens: number;
+  }[];
+  error_rate: {
+    date: string;
+    total: number;
+    errors: number;
+    error_rate: number;
+  }[];
+  score_trends: {
+    date: string;
+    name: string;
+    average: number;
+    count: number;
+  }[];
 }
 
 // --- Session & User ---

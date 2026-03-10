@@ -41,7 +41,10 @@ export class ScoresResource extends BaseResource {
   }
 
   async create(data: CreateScoreRequest): Promise<Score> {
-    const body = await this.http.post("/api/v1/scores", data as unknown as Record<string, unknown>);
+    const body = await this.http.post(
+      "/api/v1/scores",
+      data as unknown as Record<string, unknown>,
+    );
     return this.unwrap(body) as Score;
   }
 
@@ -57,7 +60,10 @@ export class ScoresResource extends BaseResource {
     await this.http.delete(`/api/v1/scores/${scoreId}`);
   }
 
-  async getAggregates(params?: { trace_id?: string; name?: string }): Promise<ScoreAggregate[]> {
+  async getAggregates(params?: {
+    trace_id?: string;
+    name?: string;
+  }): Promise<ScoreAggregate[]> {
     const query: Record<string, string | number> = {};
     if (params?.trace_id) query.trace_id = params.trace_id;
     if (params?.name) query.name = params.name;
@@ -67,7 +73,9 @@ export class ScoresResource extends BaseResource {
   }
 
   // Score Configs
-  async listConfigs(params?: ListParams): Promise<PaginatedResponse<ScoreConfig>> {
+  async listConfigs(
+    params?: ListParams,
+  ): Promise<PaginatedResponse<ScoreConfig>> {
     const query: Record<string, string | number> = {
       page: params?.page ?? 1,
       limit: params?.limit ?? 20,
@@ -89,7 +97,10 @@ export class ScoresResource extends BaseResource {
     return this.unwrap(body) as ScoreConfig;
   }
 
-  async updateConfig(configId: string, data: UpdateScoreConfigRequest): Promise<ScoreConfig> {
+  async updateConfig(
+    configId: string,
+    data: UpdateScoreConfigRequest,
+  ): Promise<ScoreConfig> {
     const body = await this.http.patch(
       `/api/v1/score-configs/${configId}`,
       data as unknown as Record<string, unknown>,

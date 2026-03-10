@@ -29,7 +29,9 @@ export class WebhookTriggersResource extends BaseResource {
     return this.unwrap(body) as WebhookTrigger;
   }
 
-  async create(data: CreateWebhookTriggerRequest): Promise<WebhookTriggerCreateResponse> {
+  async create(
+    data: CreateWebhookTriggerRequest,
+  ): Promise<WebhookTriggerCreateResponse> {
     const body = await this.http.post(
       "/api/v1/webhook-triggers",
       data as unknown as Record<string, unknown>,
@@ -37,7 +39,10 @@ export class WebhookTriggersResource extends BaseResource {
     return this.unwrap(body) as WebhookTriggerCreateResponse;
   }
 
-  async update(triggerId: string, data: UpdateWebhookTriggerRequest): Promise<WebhookTrigger> {
+  async update(
+    triggerId: string,
+    data: UpdateWebhookTriggerRequest,
+  ): Promise<WebhookTrigger> {
     const body = await this.http.patch(
       `/api/v1/webhook-triggers/${triggerId}`,
       data as unknown as Record<string, unknown>,

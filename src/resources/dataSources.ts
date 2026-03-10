@@ -32,7 +32,10 @@ export class DataSourcesResource extends BaseResource {
     return this.unwrap(body) as DataSource;
   }
 
-  async update(dataSourceId: string, data: UpdateDataSourceRequest): Promise<DataSource> {
+  async update(
+    dataSourceId: string,
+    data: UpdateDataSourceRequest,
+  ): Promise<DataSource> {
     const body = await this.http.patch(
       `/api/v1/data-sources/${dataSourceId}`,
       data as unknown as Record<string, unknown>,
@@ -45,7 +48,9 @@ export class DataSourcesResource extends BaseResource {
   }
 
   async listVersions(dataSourceId: string): Promise<DataSourceVersion[]> {
-    const body = await this.http.get(`/api/v1/data-sources/${dataSourceId}/versions`);
+    const body = await this.http.get(
+      `/api/v1/data-sources/${dataSourceId}/versions`,
+    );
     const data = this.unwrap(body);
     return Array.isArray(data) ? data : [];
   }
@@ -61,7 +66,10 @@ export class DataSourcesResource extends BaseResource {
     return this.unwrap(body) as DataSourceVersion;
   }
 
-  async promoteVersion(dataSourceId: string, versionId: string): Promise<Record<string, unknown>> {
+  async promoteVersion(
+    dataSourceId: string,
+    versionId: string,
+  ): Promise<Record<string, unknown>> {
     const body = await this.http.put(
       `/api/v1/data-sources/${dataSourceId}/versions/${versionId}/promote`,
       {},
@@ -81,7 +89,9 @@ export class DataSourcesResource extends BaseResource {
   }
 
   async testConnection(dataSourceId: string): Promise<Record<string, unknown>> {
-    const body = await this.http.post(`/api/v1/data-sources/${dataSourceId}/test-connection`);
+    const body = await this.http.post(
+      `/api/v1/data-sources/${dataSourceId}/test-connection`,
+    );
     return this.unwrap(body) as Record<string, unknown>;
   }
 

@@ -52,7 +52,10 @@ export class PromptsResource extends BaseResource {
     return Array.isArray(data) ? data : [];
   }
 
-  async createVersion(promptId: string, data: CreatePromptVersionRequest): Promise<PromptVersion> {
+  async createVersion(
+    promptId: string,
+    data: CreatePromptVersionRequest,
+  ): Promise<PromptVersion> {
     const body = await this.http.post(
       `/api/v1/prompts/${promptId}/versions`,
       data as unknown as Record<string, unknown>,
@@ -60,7 +63,10 @@ export class PromptsResource extends BaseResource {
     return this.unwrap(body) as PromptVersion;
   }
 
-  async promoteVersion(promptId: string, versionId: string): Promise<Record<string, unknown>> {
+  async promoteVersion(
+    promptId: string,
+    versionId: string,
+  ): Promise<Record<string, unknown>> {
     const body = await this.http.put(
       `/api/v1/prompts/${promptId}/versions/${versionId}/promote`,
       {},
@@ -79,7 +85,10 @@ export class PromptsResource extends BaseResource {
     return this.unwrap(body) as Record<string, unknown>;
   }
 
-  async runPrompt(promptId: string, data: RunPromptRequest): Promise<RunPromptResponse> {
+  async runPrompt(
+    promptId: string,
+    data: RunPromptRequest,
+  ): Promise<RunPromptResponse> {
     const body = await this.http.post(
       `/api/v1/prompts/${promptId}/run`,
       data as unknown as Record<string, unknown>,

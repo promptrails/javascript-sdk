@@ -52,7 +52,10 @@ export class HTTPClient {
         const body: Record<string, unknown> = text ? JSON.parse(text) : {};
 
         if (response.status >= 500) {
-          throw new ServerError((body.error as string) || "Server error", response.status);
+          throw new ServerError(
+            (body.error as string) || "Server error",
+            response.status,
+          );
         }
 
         raiseForStatus(response.status, body);
@@ -71,7 +74,9 @@ export class HTTPClient {
         }
 
         if (attempt < this.config.maxRetries) {
-          await new Promise((r) => setTimeout(r, Math.min(2 ** attempt * 1000, 8000)));
+          await new Promise((r) =>
+            setTimeout(r, Math.min(2 ** attempt * 1000, 8000)),
+          );
           continue;
         }
         throw lastError;
@@ -81,7 +86,10 @@ export class HTTPClient {
     throw lastError || new Error("Request failed");
   }
 
-  get(path: string, params?: Record<string, string | number>): Promise<Record<string, unknown>> {
+  get(
+    path: string,
+    params?: Record<string, string | number>,
+  ): Promise<Record<string, unknown>> {
     return this.request("GET", path, { params });
   }
 
@@ -93,11 +101,17 @@ export class HTTPClient {
     return this.request("POST", path, { json, params });
   }
 
-  patch(path: string, json?: Record<string, unknown>): Promise<Record<string, unknown>> {
+  patch(
+    path: string,
+    json?: Record<string, unknown>,
+  ): Promise<Record<string, unknown>> {
     return this.request("PATCH", path, { json });
   }
 
-  put(path: string, json?: Record<string, unknown>): Promise<Record<string, unknown>> {
+  put(
+    path: string,
+    json?: Record<string, unknown>,
+  ): Promise<Record<string, unknown>> {
     return this.request("PUT", path, { json });
   }
 
