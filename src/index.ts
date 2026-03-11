@@ -68,4 +68,9 @@ export {
   WebhookTriggerCreateResponse,
   CreateWebhookTriggerRequest,
   UpdateWebhookTriggerRequest,
+  MediaModel,
+  MediaGenerateRequest,
+  MediaGenerateResponse,
+  Asset,
+  AssetSignedUrl,
 } from "./types";

@@ -69,7 +69,64 @@ try {
 | `client.mcpTools`        | `list`, `get`, `create`, `update`, `delete`                              |
 | `client.approvals`       | `list`, `get`, `decide`                                                  |
 | `client.webhookTriggers` | `list`, `get`, `create`, `update`, `delete`                              |
+| `client.mediaModels`     | `list`                                                                   |
+| `client.media`           | `generate`                                                               |
+| `client.assets`          | `list`, `get`, `delete`, `getSignedUrl`                                  |
 | `client.a2a`             | `getAgentCard`, `sendMessage`, `getTask`, `listTasks`, `cancelTask`      |
+
+## Media Studio
+
+Generate images, speech, and video using various AI providers.
+
+```typescript
+// Generate an image
+const result = await client.media.generate({
+  provider: "fal",
+  media_type: "image",
+  model: "fal-ai/flux/schnell",
+  prompt: "A futuristic cityscape at sunset",
+  config: { width: 1024, height: 1024 },
+});
+console.log(result.asset_id, result.url);
+
+// Generate speech
+const speech = await client.media.generate({
+  provider: "elevenlabs",
+  media_type: "speech",
+  model: "eleven_multilingual_v2",
+  prompt: "Hello, welcome to PromptRails!",
+});
+```
+
+## Media Models
+
+List available media models, optionally filtered by provider or type.
+
+```typescript
+const models = await client.mediaModels.list({
+  provider: "fal",
+  media_type: "image",
+});
+console.log(models.data);
+```
+
+## Assets
+
+Browse and manage generated media assets.
+
+```typescript
+// List assets
+const assets = await client.assets.list({ type: "image", page: 1, limit: 10 });
+
+// Get a single asset
+const asset = await client.assets.get("asset-id");
+
+// Get a signed download URL
+const { url } = await client.assets.getSignedUrl("asset-id");
+
+// Delete an asset
+await client.assets.delete("asset-id");
+```
 
 ## Configuration
 

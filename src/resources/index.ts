@@ -18,3 +18,6 @@ export { SessionsResource } from "./sessions";
 export { A2AResource } from "./a2a";
 export { LLMModelsResource } from "./llm-models";
 export { WebhookTriggersResource } from "./webhookTriggers";
+export { MediaModelsResource } from "./media-models";
+export { MediaResource } from "./media";
+export { AssetsResource } from "./assets";

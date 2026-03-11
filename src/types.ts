@@ -754,3 +754,63 @@ export interface UpdateWebhookTriggerRequest {
   name?: string;
   is_active?: boolean;
 }
+
+// --- Media Models ---
+
+export interface MediaModel {
+  id: string;
+  provider: string;
+  model_id: string;
+  display_name: string;
+  media_type: string;
+  is_active: boolean;
+  config?: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+}
+
+// --- Media Studio ---
+
+export interface MediaGenerateRequest {
+  provider: string;
+  media_type: string;
+  model: string;
+  prompt?: string;
+  input_url?: string;
+  config?: Record<string, unknown>;
+  guardrails?: Record<string, unknown>;
+}
+
+export interface MediaGenerateResponse {
+  asset_id: string;
+  status: string;
+  url?: string;
+  execution_id?: string;
+  trace_id?: string;
+}
+
+// --- Assets ---
+
+export interface Asset {
+  id: string;
+  workspace_id: string;
+  type: string;
+  provider: string;
+  model?: string;
+  file_name: string;
+  file_size?: number;
+  mime_type?: string;
+  storage_path: string;
+  prompt?: string;
+  config?: Record<string, unknown>;
+  execution_id?: string;
+  agent_id?: string;
+  created_by_id?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AssetSignedUrl {
+  url: string;
+  expires_at: string;
+}

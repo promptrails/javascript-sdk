@@ -21,6 +21,9 @@ import {
   A2AResource,
   LLMModelsResource,
   WebhookTriggersResource,
+  MediaModelsResource,
+  MediaResource,
+  AssetsResource,
 } from "./resources";
 
 export class PromptRails {
@@ -44,6 +47,9 @@ export class PromptRails {
   public readonly a2a: A2AResource;
   public readonly llmModels: LLMModelsResource;
   public readonly webhookTriggers: WebhookTriggersResource;
+  public readonly mediaModels: MediaModelsResource;
+  public readonly media: MediaResource;
+  public readonly assets: AssetsResource;
 
   constructor(options: ClientOptions) {
     const config = resolveConfig(options);
@@ -69,5 +75,8 @@ export class PromptRails {
     this.a2a = new A2AResource(http);
     this.llmModels = new LLMModelsResource(http);
     this.webhookTriggers = new WebhookTriggersResource(http);
+    this.mediaModels = new MediaModelsResource(http);
+    this.media = new MediaResource(http);
+    this.assets = new AssetsResource(http);
   }
 }
