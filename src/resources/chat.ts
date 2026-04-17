@@ -1,10 +1,12 @@
 import { PaginatedResponse, parsePaginatedResponse } from "../pagination";
+import { parseSSEStream } from "../sse";
 import {
   ChatSession,
   ChatMessage,
   CreateChatSessionRequest,
   SendMessageRequest,
   ListParams,
+  StreamEvent,
 } from "../types";
 
 import { BaseResource } from "./base";
@@ -60,5 +62,28 @@ export class ChatResource extends BaseResource {
       data as unknown as Record<string, unknown>,
     );
     return this.unwrap(body) as ChatMessage;
+  }
+
+  /**
+   * Send a message and stream the agent's execution events on the same
+   * connection. The generator yields typed StreamEvents — begin by handling
+   * "execution" (you get the execution_id) and end on "done" or "error".
+   *
+   * Abort by calling the returned AbortController.abort() or pass a signal.
+   */
+  async *sendMessageStream(
+    sessionId: string,
+    data: SendMessageRequest,
+    options?: { signal?: AbortSignal },
+  ): AsyncGenerator<StreamEvent> {
+    const response = await this.http.stream(
+      "POST",
+      `/api/v1/chat/sessions/${sessionId}/messages/stream`,
+      {
+        json: data as unknown as Record<string, unknown>,
+        signal: options?.signal,
+      },
+    );
+    yield* parseSSEStream(response, options?.signal);
   }
 }

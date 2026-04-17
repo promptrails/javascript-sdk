@@ -345,13 +345,101 @@ export interface UpdateAgentRequest {
   description?: string;
 }
 
+// === Agent config (discriminated union by agent type) ===
+//
+// Each agent.type has a different config shape. The SDK uses a discriminated
+// union so callers get compile-time autocompletion and catch renames like
+// prompt_version_id -> prompt_id at the type level.
+
+export interface PromptLink {
+  prompt_id: string;
+  role: string;
+  sort_order: number;
+}
+
+export interface WorkflowNode {
+  id: string;
+  prompt_id?: string;
+  depends_on: string[];
+  node_type?: "prompt" | "media";
+  media_provider?: string;
+  media_type?: string;
+  media_model?: string;
+  media_config?: Record<string, unknown>;
+}
+
+export interface CompositeStep {
+  id: string;
+  agent_id: string;
+  depends_on?: string[];
+  input_mapping?: Record<string, unknown>;
+}
+
+export interface SimpleAgentConfig {
+  type: "simple";
+  prompt_id: string;
+  approval_required?: boolean;
+  approval_checkpoint_name?: string;
+  max_tokens?: number;
+  temperature?: number;
+  llm_model_id?: string;
+}
+
+export interface ChainAgentConfig {
+  type: "chain";
+  prompt_ids: PromptLink[];
+  approval_required?: boolean;
+  approval_checkpoint_name?: string;
+}
+
+export interface MultiAgentConfig {
+  type: "multi_agent";
+  prompt_ids: PromptLink[];
+}
+
+export interface WorkflowAgentConfig {
+  type: "workflow";
+  nodes: WorkflowNode[];
+}
+
+export interface CompositeAgentConfig {
+  type: "composite";
+  steps: CompositeStep[];
+}
+
+export type AgentConfig =
+  | SimpleAgentConfig
+  | ChainAgentConfig
+  | MultiAgentConfig
+  | WorkflowAgentConfig
+  | CompositeAgentConfig;
+
+export type AgentType = AgentConfig["type"];
+
 export interface CreateAgentVersionRequest {
   version: string;
-  config?: Record<string, unknown>;
+  config: AgentConfig;
   input_schema?: Record<string, unknown>;
   output_schema?: Record<string, unknown>;
   set_current?: boolean;
   message?: string;
+}
+
+// === Streaming events (emitted by the backend over SSE) ===
+
+export type StreamEvent =
+  | { type: "execution"; executionId: string; userMessageId?: string }
+  | { type: "thinking"; content: string }
+  | { type: "tool_start"; id: string; name: string }
+  | { type: "tool_end"; id: string; name: string; summary?: string }
+  | { type: "content"; content: string }
+  | { type: "done"; output?: unknown; tokenUsage?: TokenUsage }
+  | { type: "error"; message: string };
+
+export interface TokenUsage {
+  prompt_tokens?: number;
+  completion_tokens?: number;
+  total_tokens?: number;
 }
 
 export interface ExecuteAgentRequest {

@@ -73,4 +73,19 @@ export {
   MediaGenerateResponse,
   Asset,
   AssetSignedUrl,
+  // Typed agent config
+  AgentConfig,
+  AgentType,
+  SimpleAgentConfig,
+  ChainAgentConfig,
+  MultiAgentConfig,
+  WorkflowAgentConfig,
+  CompositeAgentConfig,
+  PromptLink,
+  WorkflowNode,
+  CompositeStep,
+  // Streaming
+  StreamEvent,
+  TokenUsage,
 } from "./types";
+export { parseSSEStream } from "./sse";

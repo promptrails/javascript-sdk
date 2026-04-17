@@ -1,5 +1,6 @@
 import { PaginatedResponse, parsePaginatedResponse } from "../pagination";
-import { AgentExecution, ListParams } from "../types";
+import { parseSSEStream } from "../sse";
+import { AgentExecution, ListParams, StreamEvent } from "../types";
 
 import { BaseResource } from "./base";
 
@@ -25,5 +26,22 @@ export class ExecutionsResource extends BaseResource {
   async get(executionId: string): Promise<AgentExecution> {
     const body = await this.http.get(`/api/v1/executions/${executionId}`);
     return this.unwrap(body) as AgentExecution;
+  }
+
+  /**
+   * Subscribe to the live SSE stream for an execution. Useful when the
+   * execution was started via a non-chat path (e.g. agents.execute) and the
+   * caller wants progressive updates.
+   */
+  async *stream(
+    executionId: string,
+    options?: { signal?: AbortSignal },
+  ): AsyncGenerator<StreamEvent> {
+    const response = await this.http.stream(
+      "GET",
+      `/api/v1/executions/${executionId}/stream`,
+      { signal: options?.signal },
+    );
+    yield* parseSSEStream(response, options?.signal);
   }
 }

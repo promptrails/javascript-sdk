@@ -118,4 +118,49 @@ export class HTTPClient {
   delete(path: string): Promise<Record<string, unknown>> {
     return this.request("DELETE", path);
   }
+
+  /**
+   * Open a Server-Sent Events stream. Returns the raw Response so the caller
+   * can pipe the body through a dedicated SSE parser. The caller owns the
+   * AbortSignal; no retry/timeout wrapping is applied because streams are
+   * long-lived by design.
+   */
+  async stream(
+    method: "GET" | "POST",
+    path: string,
+    options?: {
+      json?: Record<string, unknown>;
+      signal?: AbortSignal;
+    },
+  ): Promise<Response> {
+    const url = `${this.config.baseUrl}${path}`;
+    const fetchOptions: RequestInit = {
+      method,
+      headers: {
+        "X-API-Key": this.config.apiKey,
+        "Content-Type": "application/json",
+        Accept: "text/event-stream",
+      },
+      signal: options?.signal,
+    };
+    if (options?.json && method !== "GET") {
+      fetchOptions.body = JSON.stringify(options.json);
+    }
+
+    const response = await fetch(url, fetchOptions);
+    if (!response.ok) {
+      let body: Record<string, unknown> = {};
+      try {
+        body = (await response.json()) as Record<string, unknown>;
+      } catch {
+        /* ignore */
+      }
+      raiseForStatus(response.status, body);
+      throw new ServerError(
+        (body.error as string) || `HTTP ${response.status}`,
+        response.status,
+      );
+    }
+    return response;
+  }
 }
