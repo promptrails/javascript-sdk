@@ -89,3 +89,4 @@ export {
   TokenUsage,
 } from "./types";
 export { parseSSEStream } from "./sse";
+export { VERSION } from "./version";

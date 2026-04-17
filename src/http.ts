@@ -1,5 +1,6 @@
 import { Config } from "./config";
 import { RateLimitError, ServerError, raiseForStatus } from "./errors";
+import { VERSION } from "./version";
 
 export class HTTPClient {
   private config: Config;
@@ -39,6 +40,7 @@ export class HTTPClient {
             "X-API-Key": this.config.apiKey,
             "Content-Type": "application/json",
             Accept: "application/json",
+            "User-Agent": `promptrails-js/${VERSION}`,
           },
           signal: AbortSignal.timeout(this.config.timeout),
         };
@@ -140,6 +142,7 @@ export class HTTPClient {
         "X-API-Key": this.config.apiKey,
         "Content-Type": "application/json",
         Accept: "text/event-stream",
+        "User-Agent": `promptrails-js/${VERSION}`,
       },
       signal: options?.signal,
     };
