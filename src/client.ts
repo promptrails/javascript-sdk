@@ -20,7 +20,8 @@ import {
   SessionsResource,
   A2AResource,
   LLMModelsResource,
-  WebhookTriggersResource,
+  AgentTriggersResource,
+  AgentVFSResource,
   MediaModelsResource,
   MediaResource,
   AssetsResource,
@@ -46,7 +47,8 @@ export class PromptRails {
   public readonly sessions: SessionsResource;
   public readonly a2a: A2AResource;
   public readonly llmModels: LLMModelsResource;
-  public readonly webhookTriggers: WebhookTriggersResource;
+  public readonly agentTriggers: AgentTriggersResource;
+  public readonly agentVfs: AgentVFSResource;
   public readonly mediaModels: MediaModelsResource;
   public readonly media: MediaResource;
   public readonly assets: AssetsResource;
@@ -74,7 +76,8 @@ export class PromptRails {
     this.sessions = new SessionsResource(http);
     this.a2a = new A2AResource(http);
     this.llmModels = new LLMModelsResource(http);
-    this.webhookTriggers = new WebhookTriggersResource(http);
+    this.agentTriggers = new AgentTriggersResource(http);
+    this.agentVfs = new AgentVFSResource(http);
     this.mediaModels = new MediaModelsResource(http);
     this.media = new MediaResource(http);
     this.assets = new AssetsResource(http);

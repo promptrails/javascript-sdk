@@ -68,7 +68,8 @@ try {
 | `client.scores`          | `list`, `get`, `create`, `update`, `delete`, `listConfigs`, `getConfig`, `createConfig`, `updateConfig`, `deleteConfig`, `aggregates` |
 | `client.mcpTools`        | `list`, `get`, `create`, `update`, `delete`                              |
 | `client.approvals`       | `list`, `get`, `decide`                                                  |
-| `client.webhookTriggers` | `list`, `get`, `create`, `update`, `delete`                              |
+| `client.agentTriggers`   | `list`, `get`, `create` (with `source` + `source_config`), `update`, `delete` |
+| `client.agentVfs`        | `list`, `read`, `write`, `stat`, `mkdir`, `move`, `copy`, `delete`, `grep`, `glob`, `usage` |
 | `client.mediaModels`     | `list`                                                                   |
 | `client.media`           | `generate`                                                               |
 | `client.assets`          | `list`, `get`, `delete`, `getSignedUrl`                                  |

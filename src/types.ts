@@ -813,13 +813,24 @@ export interface A2AAgentCard {
 }
 
 // Webhook Trigger types
-export interface WebhookTrigger {
+export type AgentTriggerSource =
+  | "generic"
+  | "slack"
+  | "telegram"
+  | "whatsapp"
+  | "teams"
+  | "schedule";
+
+export interface AgentTrigger {
   id: string;
   workspace_id: string;
   agent_id: string;
   name: string;
   token: string;
   token_prefix: string;
+  source: AgentTriggerSource;
+  source_config: Record<string, unknown>;
+  reply_config: Record<string, unknown>;
   is_active: boolean;
   has_secret: boolean;
   last_used_at?: string;
@@ -828,20 +839,58 @@ export interface WebhookTrigger {
   updated_at: string;
 }
 
-export interface WebhookTriggerCreateResponse extends WebhookTrigger {
+export interface AgentTriggerCreateResponse extends AgentTrigger {
   secret?: string;
 }
 
-export interface CreateWebhookTriggerRequest {
+export interface CreateAgentTriggerRequest {
   name: string;
   agent_id: string;
+  source?: AgentTriggerSource;
+  source_config?: Record<string, unknown>;
+  reply_config?: Record<string, unknown>;
   generate_secret?: boolean;
 }
 
-export interface UpdateWebhookTriggerRequest {
+export interface UpdateAgentTriggerRequest {
   name?: string;
   is_active?: boolean;
+  source?: AgentTriggerSource;
+  source_config?: Record<string, unknown>;
+  reply_config?: Record<string, unknown>;
 }
+
+export interface AgentVFSFile {
+  id: string;
+  workspace_id: string;
+  agent_id: string;
+  path: string;
+  parent_path: string;
+  name: string;
+  is_dir: boolean;
+  content?: string;
+  size_bytes: number;
+  mime_type?: string;
+  metadata?: Record<string, unknown>;
+  last_writer_kind: "agent" | "user" | "trigger";
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AgentVFSGrepMatch {
+  path: string;
+  line_number: number;
+  line: string;
+}
+
+export interface AgentVFSReadResult {
+  file: AgentVFSFile;
+  content: string;
+  total_lines: number;
+  truncated: boolean;
+}
+
+export type AgentVFSWriteMode = "overwrite" | "append";
 
 // --- Media Models ---
 
