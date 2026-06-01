@@ -3,4 +3,4 @@
  * package.json and git tags — used for the User-Agent header and debug
  * telemetry so the backend can see which client is talking to it.
  */
-export const VERSION = "0.5.0";
+export const VERSION = "0.6.0";
