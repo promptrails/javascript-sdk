@@ -1,4 +1,6 @@
 import { HTTPClient } from "../src/http";
+import { traceAnthropic } from "../src/tracing/integrations/anthropic";
+import { traceGoogle } from "../src/tracing/integrations/google";
 import { PromptRailsCallbackHandler } from "../src/tracing/integrations/langchain";
 import { traceOpenAI } from "../src/tracing/integrations/openai";
 import { otelSpanToPayload } from "../src/tracing/integrations/otel";
@@ -114,6 +116,81 @@ describe("traceOpenAI", () => {
     expect(span.prompt_tokens).toBe(12);
     expect(span.total_tokens).toBe(20);
     expect(span.output).toEqual({ content: "hello" });
+  });
+});
+
+describe("traceAnthropic", () => {
+  it("wraps messages.create", async () => {
+    const http = mockHttp();
+    const t = tracer(http);
+    const client = {
+      messages: {
+        create: async (_params: {
+          model?: string;
+          messages?: unknown;
+          system?: unknown;
+        }) => ({
+          model: "claude-sonnet-4-5",
+          usage: { input_tokens: 30, output_tokens: 9 },
+          content: [{ text: "hi there" }],
+        }),
+      },
+    };
+    const traced = traceAnthropic(client, t);
+
+    const resp = await traced.messages.create({
+      model: "claude-sonnet-4-5",
+      messages: [],
+    });
+    expect(resp.model).toBe("claude-sonnet-4-5");
+    await t.shutdown();
+
+    const span = postedSpans(http)[0];
+    expect(span.kind).toBe("llm");
+    expect(span.model_name).toBe("claude-sonnet-4-5");
+    expect(span.prompt_tokens).toBe(30);
+    expect(span.completion_tokens).toBe(9);
+    expect(span.total_tokens).toBe(39);
+    expect(span.output).toEqual({ content: "hi there" });
+  });
+});
+
+describe("traceGoogle", () => {
+  it("wraps models.generateContent", async () => {
+    const http = mockHttp();
+    const t = tracer(http);
+    const client = {
+      models: {
+        generateContent: async (_params: {
+          model?: string;
+          contents?: unknown;
+        }) => ({
+          text: "hello from gemini",
+          modelVersion: "gemini-2.0-flash",
+          usageMetadata: {
+            promptTokenCount: 5,
+            candidatesTokenCount: 7,
+            totalTokenCount: 12,
+          },
+        }),
+      },
+    };
+    const traced = traceGoogle(client, t);
+
+    const resp = await traced.models.generateContent({
+      model: "gemini-2.0-flash",
+      contents: "hi",
+    });
+    expect(resp.text).toBe("hello from gemini");
+    await t.shutdown();
+
+    const span = postedSpans(http)[0];
+    expect(span.kind).toBe("llm");
+    expect(span.model_name).toBe("gemini-2.0-flash");
+    expect(span.prompt_tokens).toBe(5);
+    expect(span.completion_tokens).toBe(7);
+    expect(span.total_tokens).toBe(12);
+    expect(span.output).toEqual({ text: "hello from gemini" });
   });
 });
 

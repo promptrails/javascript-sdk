@@ -1,6 +1,6 @@
 {
   "name": "@promptrails/sdk",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "description": "Official TypeScript SDK for the PromptRails API",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -26,6 +26,16 @@
       "import": "./dist/tracing/integrations/langchain.js",
       "require": "./dist/cjs/tracing/integrations/langchain.js",
       "types": "./dist/tracing/integrations/langchain.d.ts"
+    },
+    "./tracing/integrations/anthropic": {
+      "import": "./dist/tracing/integrations/anthropic.js",
+      "require": "./dist/cjs/tracing/integrations/anthropic.js",
+      "types": "./dist/tracing/integrations/anthropic.d.ts"
+    },
+    "./tracing/integrations/google": {
+      "import": "./dist/tracing/integrations/google.js",
+      "require": "./dist/cjs/tracing/integrations/google.js",
+      "types": "./dist/tracing/integrations/google.d.ts"
     },
     "./tracing/integrations/otel": {
       "import": "./dist/tracing/integrations/otel.js",
