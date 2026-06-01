@@ -41,12 +41,23 @@ export interface LLMModel {
   display_name: string;
   input_price?: number | null;
   output_price?: number | null;
+  cached_input_price?: number | null;
   max_tokens?: number | null;
   supports_vision: boolean;
   supports_tools: boolean;
   supports_json: boolean;
   supports_streaming: boolean;
+  supports_temperature: boolean;
+  supports_top_p: boolean;
+  supports_top_k: boolean;
+  supports_reasoning: boolean;
+  supports_web_search: boolean;
+  supports_prompt_caching: boolean;
   is_active: boolean;
+  is_deprecated: boolean;
+  deprecated_at?: string | null;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface AvailableModelEntry {
@@ -57,8 +68,15 @@ export interface AvailableModelEntry {
   supports_vision: boolean;
   supports_tools: boolean;
   supports_json: boolean;
+  supports_temperature: boolean;
+  supports_top_p: boolean;
+  supports_top_k: boolean;
+  supports_reasoning: boolean;
+  supports_web_search: boolean;
+  supports_prompt_caching: boolean;
   input_price?: number | null;
   output_price?: number | null;
+  is_deprecated: boolean;
 }
 
 export interface AvailableModelGroup {
@@ -440,6 +458,9 @@ export interface TokenUsage {
   prompt_tokens?: number;
   completion_tokens?: number;
   total_tokens?: number;
+  cached_tokens?: number;
+  cache_creation_tokens?: number;
+  reasoning_tokens?: number;
 }
 
 export interface ExecuteAgentRequest {
@@ -612,12 +633,21 @@ export interface RunPromptRequest {
   temperature?: number;
   max_tokens?: number;
   top_p?: number;
+  top_k?: number;
   input?: Record<string, unknown>;
   output_schema?: Record<string, unknown>;
   tools?: string[];
   initial_messages?: Array<{ role: string; content: string }>;
   credential_id?: string;
+  cache_timeout?: number;
+  /** Feature toggles, gated by the model's capability flags. */
+  reasoning_effort?: ReasoningEffort;
+  web_search?: boolean;
+  prompt_caching?: boolean;
 }
+
+/** Provider-agnostic reasoning effort levels (matches langrails ReasoningEffort). */
+export type ReasoningEffort = "minimal" | "low" | "medium" | "high";
 
 export interface RunPromptResponse {
   content: string;
@@ -710,12 +740,25 @@ export interface DashboardMetrics {
     total_executions: number;
     total_cost: number;
     total_tokens: number;
+    prompt_tokens: number;
+    cached_tokens: number;
+    cache_creation_tokens: number;
+    cache_savings: number;
+    cache_hit_rate: number;
     total_agents: number;
     error_count: number;
     avg_duration_ms: number;
   };
   executions_by_day: { date: string; count: number }[];
   cost_by_day: { date: string; cost: number }[];
+  cache_by_day: {
+    date: string;
+    prompt_tokens: number;
+    cached_tokens: number;
+    cache_creation_tokens: number;
+    cache_hit_rate: number;
+    savings: number;
+  }[];
   agent_usage: {
     agent_id: string;
     agent_name: string;
@@ -901,6 +944,8 @@ export interface MediaModel {
   display_name: string;
   media_type: string;
   is_active: boolean;
+  is_deprecated: boolean;
+  deprecated_at?: string | null;
   config?: Record<string, unknown>;
   created_at: string;
   updated_at: string;
