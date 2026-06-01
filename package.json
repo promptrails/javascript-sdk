@@ -11,6 +11,26 @@
       "import": "./dist/index.js",
       "require": "./dist/cjs/index.js",
       "types": "./dist/index.d.ts"
+    },
+    "./tracing": {
+      "import": "./dist/tracing/index.js",
+      "require": "./dist/cjs/tracing/index.js",
+      "types": "./dist/tracing/index.d.ts"
+    },
+    "./tracing/integrations/openai": {
+      "import": "./dist/tracing/integrations/openai.js",
+      "require": "./dist/cjs/tracing/integrations/openai.js",
+      "types": "./dist/tracing/integrations/openai.d.ts"
+    },
+    "./tracing/integrations/langchain": {
+      "import": "./dist/tracing/integrations/langchain.js",
+      "require": "./dist/cjs/tracing/integrations/langchain.js",
+      "types": "./dist/tracing/integrations/langchain.d.ts"
+    },
+    "./tracing/integrations/otel": {
+      "import": "./dist/tracing/integrations/otel.js",
+      "require": "./dist/cjs/tracing/integrations/otel.js",
+      "types": "./dist/tracing/integrations/otel.d.ts"
     }
   },
   "files": [
