@@ -4,7 +4,6 @@ export { ExecutionsResource } from "./executions";
 export { CredentialsResource } from "./credentials";
 export { DataSourcesResource } from "./dataSources";
 export { ChatResource } from "./chat";
-export { MemoriesResource } from "./memories";
 export { TracesResource } from "./traces";
 export { CostsResource } from "./costs";
 export { MCPToolsResource } from "./mcpTools";

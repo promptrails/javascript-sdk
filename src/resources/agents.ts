@@ -2,7 +2,6 @@ import { PaginatedResponse, parsePaginatedResponse } from "../pagination";
 import {
   Agent,
   AgentVersion,
-  AgentMemory,
   ExecutionResult,
   Guardrail,
   CreateAgentRequest,
@@ -10,8 +9,6 @@ import {
   CreateAgentVersionRequest,
   ExecuteAgentRequest,
   CreateGuardrailRequest,
-  CreateMemoryRequest,
-  SearchMemoryRequest,
   ListParams,
 } from "../types";
 
@@ -121,43 +118,5 @@ export class AgentsResource extends BaseResource {
       data as unknown as Record<string, unknown>,
     );
     return this.unwrap(body) as Guardrail;
-  }
-
-  async listMemories(
-    agentId: string,
-    params?: ListParams,
-  ): Promise<PaginatedResponse<AgentMemory>> {
-    const body = await this.http.get(`/api/v1/agents/${agentId}/memories`, {
-      page: params?.page ?? 1,
-      limit: params?.limit ?? 20,
-    });
-    return parsePaginatedResponse<AgentMemory>(body);
-  }
-
-  async createMemory(
-    agentId: string,
-    data: CreateMemoryRequest,
-  ): Promise<AgentMemory> {
-    const body = await this.http.post(
-      `/api/v1/agents/${agentId}/memories`,
-      data as unknown as Record<string, unknown>,
-    );
-    return this.unwrap(body) as AgentMemory;
-  }
-
-  async searchMemories(
-    agentId: string,
-    data: SearchMemoryRequest,
-  ): Promise<AgentMemory[]> {
-    const body = await this.http.post(
-      `/api/v1/agents/${agentId}/memories/search`,
-      data as unknown as Record<string, unknown>,
-    );
-    const result = this.unwrap(body);
-    return Array.isArray(result) ? result : [];
-  }
-
-  async deleteAllMemories(agentId: string): Promise<void> {
-    await this.http.delete(`/api/v1/agents/${agentId}/memories`);
   }
 }

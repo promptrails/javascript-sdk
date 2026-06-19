@@ -44,7 +44,6 @@ describe("PromptRails client", () => {
     expect(client.credentials).toBeDefined();
     expect(client.dataSources).toBeDefined();
     expect(client.chat).toBeDefined();
-    expect(client.memories).toBeDefined();
     expect(client.traces).toBeDefined();
     expect(client.costs).toBeDefined();
     expect(client.mcpTools).toBeDefined();

@@ -40,7 +40,7 @@ try {
 
 | Resource                 | Methods                                                                  |
 | ------------------------ | ------------------------------------------------------------------------ |
-| `client.agents`          | `list`, `get`, `create`, `update`, `delete`, `execute`, `listVersions`, `createVersion`, `listGuardrails`, `createGuardrail`, `listMemories`, `createMemory`, `searchMemories`, `deleteAllMemories` |
+| `client.agents`          | `list`, `get`, `create`, `update`, `delete`, `execute`, `listVersions`, `createVersion`, `listGuardrails`, `createGuardrail` |
 | `client.prompts`         | `list`, `get`, `create`, `update`, `delete`, `listVersions`, `createVersion` |
 | `client.executions`      | `list`, `get`                                                            |
 | `client.credentials`     | `list`, `get`, `create`, `update`, `delete`, `setDefault`, `checkConnection` |

@@ -7,7 +7,6 @@ import {
   CredentialsResource,
   DataSourcesResource,
   ChatResource,
-  MemoriesResource,
   TracesResource,
   CostsResource,
   MCPToolsResource,
@@ -34,7 +33,6 @@ export class PromptRails {
   public readonly credentials: CredentialsResource;
   public readonly dataSources: DataSourcesResource;
   public readonly chat: ChatResource;
-  public readonly memories: MemoriesResource;
   public readonly traces: TracesResource;
   public readonly costs: CostsResource;
   public readonly mcpTools: MCPToolsResource;
@@ -63,7 +61,6 @@ export class PromptRails {
     this.credentials = new CredentialsResource(http);
     this.dataSources = new DataSourcesResource(http);
     this.chat = new ChatResource(http);
-    this.memories = new MemoriesResource(http);
     this.traces = new TracesResource(http);
     this.costs = new CostsResource(http);
     this.mcpTools = new MCPToolsResource(http);

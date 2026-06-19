@@ -193,22 +193,6 @@ export interface ChatMessage {
   created_at: string;
 }
 
-export interface AgentMemory {
-  id: string;
-  workspace_id: string;
-  agent_id: string;
-  content: string;
-  metadata?: Record<string, unknown>;
-  memory_type: string;
-  importance: number;
-  access_count: number;
-  last_accessed_at?: string;
-  chat_session_id?: string;
-  created_by_id?: string;
-  created_at: string;
-  updated_at: string;
-}
-
 export interface Trace {
   id: string;
   workspace_id: string;
@@ -538,20 +522,6 @@ export interface CreateChatSessionRequest {
 
 export interface SendMessageRequest {
   content: string;
-}
-
-export interface CreateMemoryRequest {
-  content: string;
-  memory_type: string;
-  importance?: number;
-  metadata?: Record<string, unknown>;
-  chat_session_id?: string;
-}
-
-export interface SearchMemoryRequest {
-  query: string;
-  threshold?: number;
-  limit?: number;
 }
 
 export interface CreateMCPToolRequest {

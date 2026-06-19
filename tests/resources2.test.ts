@@ -7,7 +7,6 @@ import { GuardrailsResource } from "../src/resources/guardrails";
 import { LLMModelsResource } from "../src/resources/llm-models";
 import { MCPTemplatesResource } from "../src/resources/mcpTemplates";
 import { MediaResource } from "../src/resources/media";
-import { MemoriesResource } from "../src/resources/memories";
 import { SessionsResource } from "../src/resources/sessions";
 import { TemplatesResource } from "../src/resources/templates";
 import { TracesResource } from "../src/resources/traces";
@@ -138,21 +137,6 @@ describe("MediaResource", () => {
     http.post.mockResolvedValue({ data: { job_id: "j1" } });
     await media.generate({ type: "tts" } as never);
     expect(http.post.mock.calls[0][0]).toContain("/api/v1/media");
-  });
-});
-
-describe("MemoriesResource", () => {
-  it("get and delete hit the memories endpoints", async () => {
-    const http = makeMock();
-    const memories = new MemoriesResource(http);
-
-    http.get.mockResolvedValue({ data: { id: "mem1" } });
-    await memories.get("mem1");
-    expect(http.get).toHaveBeenCalledWith("/api/v1/memories/mem1");
-
-    http.delete.mockResolvedValue({});
-    await memories.delete("mem1");
-    expect(http.delete).toHaveBeenCalledWith("/api/v1/memories/mem1");
   });
 });
 
