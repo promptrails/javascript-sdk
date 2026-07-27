@@ -1,8 +1,15 @@
-import { Guardrail, UpdateGuardrailRequest } from "../types";
+import type { Guardrail, ScannerMeta, UpdateGuardrailRequest } from "../types";
 
 import { BaseResource } from "./base";
 
 export class GuardrailsResource extends BaseResource {
+  /** List the guardrail scanners available in this workspace. */
+  async listScanners(): Promise<ScannerMeta[]> {
+    const body = await this.http.get("/api/v1/guardrails/scanners");
+    const data = this.unwrap(body);
+    return Array.isArray(data) ? (data as ScannerMeta[]) : [];
+  }
+
   async update(
     guardrailId: string,
     data: UpdateGuardrailRequest,

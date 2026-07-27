@@ -1,7 +1,7 @@
 # API Client
 
 The `PromptRails` client wraps the PromptRails REST API for managing agents,
-prompts, executions, media, and more.
+prompts, executions, traces, and more.
 
 ```typescript
 import { PromptRails } from "@promptrails/sdk";
@@ -40,51 +40,64 @@ try {
 
 | Resource                 | Methods                                                                  |
 | ------------------------ | ------------------------------------------------------------------------ |
-| `client.agents`          | `list`, `get`, `create`, `update`, `delete`, `execute`, `listVersions`, `createVersion`, `listGuardrails`, `createGuardrail` |
-| `client.prompts`         | `list`, `get`, `create`, `update`, `delete`, `listVersions`, `createVersion` |
-| `client.executions`      | `list`, `get`                                                            |
+| `client.agents`          | `list`, `get`, `create`, `update`, `delete`, `execute`, `listVersions`, `createVersion`, `promoteVersion`, `preview`, `playground`, `listGuardrails`, `createGuardrail` |
+| `client.prompts`         | `list`, `get`, `create`, `update`, `delete`, `listVersions`, `createVersion`, `promoteVersion`, `preview` |
+| `client.executions`      | `list`, `get`, `tree`, `cancel`, `approvalInbox`, `approve`, `deny`, `stream` |
 | `client.credentials`     | `list`, `get`, `create`, `update`, `delete`, `setDefault`, `checkConnection` |
 | `client.dataSources`     | `list`, `get`, `create`, `update`, `delete`, `listVersions`, `createVersion`, `testConnection`, `query` |
 | `client.chat`            | `listSessions`, `getSession`, `createSession`, `deleteSession`, `listMessages`, `sendMessage` |
-| `client.traces`          | `list`, `getByTraceId`                                                   |
-| `client.costs`           | `getSummary`, `getAgentSummary`                                          |
-| `client.scores`          | `list`, `get`, `create`, `update`, `delete`, `listConfigs`, `getConfig`, `createConfig`, `updateConfig`, `deleteConfig`, `aggregates` |
+| `client.traces`          | `list`, `getByTraceId`, `getSummary`, `piiReport`, `ingest`             |
 | `client.mcpTools`        | `list`, `get`, `create`, `update`, `delete`                              |
-| `client.approvals`       | `list`, `get`, `decide`                                                  |
+| `client.mcpTemplates`    | `list`, `get`, `getBySlug`, `install`                                    |
+| `client.guardrails`      | `listScanners`, `update`, `delete`                                       |
+| `client.llmModels`       | `list`, `listAvailable`                                                  |
 | `client.agentTriggers`   | `list`, `get`, `create` (with `source` + `source_config`), `update`, `delete` |
 | `client.agentVfs`        | `list`, `read`, `write`, `stat`, `mkdir`, `move`, `copy`, `delete`, `grep`, `glob`, `usage` |
-| `client.mediaModels`     | `list`                                                                   |
-| `client.media`           | `generate`                                                               |
 | `client.assets`          | `list`, `get`, `delete`, `getSignedUrl`                                  |
 | `client.a2a`             | `getAgentCard`, `sendMessage`, `getTask`, `listTasks`, `cancelTask`      |
 
-## Media Studio
+## Agents (API v2)
 
-Generate images, speech, and video using various AI providers.
+An agent's `type` is one of `agent` (a prompt plus optional tools / sub-agents)
+or `workflow` (a deterministic DAG of nodes). Model, sampling, run budget,
+approval policy, cache TTL and tool / sub-agent / guardrail attachments are
+version-scoped fields passed alongside `config` to `createVersion`:
 
 ```typescript
-// Generate an image
-const result = await client.media.generate({
-  provider: "fal",
-  media_type: "image",
-  model: "fal-ai/flux/schnell",
-  prompt: "A futuristic cityscape at sunset",
-  config: { width: 1024, height: 1024 },
+const agent = await client.agents.create({ name: "Support", type: "agent" });
+
+await client.agents.createVersion(agent.id, {
+  version: "1.0.0",
+  config: { type: "agent", prompt_id: "prompt-id" },
+  set_current: true,
+  model_config: { model_id: "gpt-4o", temperature: 0.2 },
+  run_budget: { max_cost: 1.0, max_tool_calls: 20 },
+  tools: [{ mcp_tool_id: "tool-id", requires_approval: true }],
+  guardrails: [{ type: "input", scanner_type: "pii" }],
 });
-console.log(result.asset_id, result.url);
+```
 
-// Generate speech
-const speech = await client.media.generate({
-  provider: "elevenlabs",
-  media_type: "speech",
-  model: "eleven_multilingual_v2",
-  prompt: "Hello, welcome to PromptRails!",
-});
+## Human-in-the-loop approvals
 
-// List available media models
-const models = await client.mediaModels.list({ provider: "fal", media_type: "image" });
+Executions parked at `waiting_approval` are resumed from the approval inbox:
 
-// Browse and manage assets
+```typescript
+const inbox = await client.executions.approvalInbox();
+for (const exec of inbox.data) {
+  await client.executions.approve(exec.id, { reason: "looks good" });
+  // or: await client.executions.deny(exec.id, { reason: "denied" });
+}
+
+// Inspect an execution tree (sub-agent delegations, handoffs, workflow nodes)
+const tree = await client.executions.tree("execution-id");
+
+// Cooperatively cancel a running execution
+await client.executions.cancel("execution-id");
+```
+
+## Assets
+
+```typescript
 const assets = await client.assets.list({ type: "image", page: 1, limit: 10 });
 const { url } = await client.assets.getSignedUrl("asset-id");
 await client.assets.delete("asset-id");

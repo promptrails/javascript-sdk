@@ -1,11 +1,11 @@
 import { PromptRails } from "../src/client";
 import { resolveConfig } from "../src/config";
 import {
-  ValidationError,
-  UnauthorizedError,
   NotFoundError,
   RateLimitError,
   raiseForStatus,
+  UnauthorizedError,
+  ValidationError,
 } from "../src/errors";
 
 describe("resolveConfig", () => {
@@ -45,10 +45,9 @@ describe("PromptRails client", () => {
     expect(client.dataSources).toBeDefined();
     expect(client.chat).toBeDefined();
     expect(client.traces).toBeDefined();
-    expect(client.costs).toBeDefined();
     expect(client.mcpTools).toBeDefined();
     expect(client.guardrails).toBeDefined();
-    expect(client.approvals).toBeDefined();
+    expect(client.assets).toBeDefined();
   });
 });
 

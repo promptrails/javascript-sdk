@@ -21,6 +21,16 @@ export interface AgentVersion {
   output_schema?: Record<string, unknown>;
   is_current: boolean;
   message?: string;
+  // Version-scoped model/runtime ownership (API v2).
+  model_config?: ModelConfig;
+  run_budget?: RunBudget;
+  approval_policy?: ApprovalPolicy;
+  cache_timeout?: number;
+  vfs_enabled?: boolean;
+  masking_enabled?: boolean;
+  tools: Record<string, unknown>[];
+  sub_agents: Record<string, unknown>[];
+  guardrails: Record<string, unknown>[];
   created_at: string;
 }
 
@@ -84,27 +94,32 @@ export interface AvailableModelGroup {
   models: AvailableModelEntry[];
 }
 
+/**
+ * A content-only prompt version (API v2). Model, sampling, tools, output
+ * schema and cache TTL live on the agent version, not on the prompt — a prompt
+ * carries no model configuration.
+ */
 export interface PromptVersion {
   id: string;
   prompt_id: string;
   version: string;
   system_prompt: string;
   user_prompt: string;
-  llm_model_id?: string;
-  fallback_llm_model_id?: string;
-  temperature?: number;
-  max_tokens?: number;
-  top_p?: number;
   input_schema: Record<string, unknown>;
-  output_schema?: Record<string, unknown>;
   is_current: boolean;
   message?: string;
   config: Record<string, unknown>;
   created_at: string;
-  llm_model?: LLMModel;
-  fallback_llm_model?: LLMModel;
 }
 
+/**
+ * An execution node. API v2 executions form a tree: a sub-agent delegation,
+ * handoff continuation or workflow agent-node run has `parent_execution_id`
+ * set and appears in its parent's `children`. Root executions have
+ * `parent_execution_id` unset. `status` gains `waiting_approval` (parked at an
+ * approval-gated tool call) and `cancel_requested` (cooperative cancel
+ * observed before finalizing).
+ */
 export interface AgentExecution {
   id: string;
   agent_id: string;
@@ -112,6 +127,7 @@ export interface AgentExecution {
   workspace_id: string;
   user_id: string;
   session_id: string;
+  parent_execution_id?: string;
   status: string;
   input: Record<string, unknown>;
   output?: Record<string, unknown>;
@@ -121,6 +137,8 @@ export interface AgentExecution {
   cost: number;
   duration_ms?: number;
   trace_id?: string;
+  approval_expires_at?: string;
+  children: AgentExecution[];
   started_at?: string;
   completed_at?: string;
   created_at: string;
@@ -193,6 +211,12 @@ export interface ChatMessage {
   created_at: string;
 }
 
+/**
+ * An observability span (API v2). `token_usage` carries raw provider counts
+ * and, when reported, extends beyond prompt/completion/total with
+ * `cached_tokens` (prompt-cache read hits), `cache_creation_tokens` and
+ * `reasoning_tokens`.
+ */
 export interface Trace {
   id: string;
   workspace_id: string;
@@ -202,35 +226,47 @@ export interface Trace {
   name: string;
   kind: string;
   status: string;
+  level: string;
   input?: Record<string, unknown>;
   output?: Record<string, unknown>;
   attributes: Record<string, unknown>;
+  tags: string[];
   token_usage?: Record<string, unknown>;
   cost?: number;
   duration_ms?: number;
+  completion_start_time?: string;
   error_message: string;
   error_type: string;
-  error_stack: string;
   prompt_tokens?: number;
   completion_tokens?: number;
   total_tokens?: number;
+  model_name: string;
   agent_id?: string;
-  prompt_id?: string;
-  llm_model_id?: string;
+  agent_name: string;
+  agent_type: string;
   user_id?: string;
   session_id: string;
   execution_id?: string;
+  data_source_id?: string;
+  data_source_name: string;
+  prompt_name: string;
+  mcp_tool_name: string;
+  mcp_tool_type: string;
   service_name: string;
   started_at: string;
   ended_at?: string;
   created_at: string;
 }
 
-export interface CostSummary {
-  total_cost: number;
-  total_executions: number;
+/** Aggregate statistics over a filtered set of traces (`/traces/summary`). */
+export interface TraceSummary {
+  total_traces: number;
   total_tokens: number;
-  daily_costs: Record<string, unknown>[];
+  total_cost: number;
+  avg_duration_ms: number;
+  error_count: number;
+  unique_models: number;
+  unique_sessions: number;
 }
 
 export interface MCPTool {
@@ -292,34 +328,31 @@ export interface Guardrail {
   updated_at: string;
 }
 
-export interface FlowTemplate {
-  id: string;
-  name: string;
-  description?: string;
-  category: string;
-  agent_type: string;
-  complexity: string;
-  tags: string[];
-  icon: string;
-  node_count: number;
-  flow_config: Record<string, unknown>;
-  status: string;
-  created_at: string;
-  updated_at: string;
+/**
+ * A guardrail attachment spec — the input shape used to create/attach a
+ * guardrail on an agent version (a sibling of `config` in
+ * `CreateAgentVersionRequest`). `id` is present on responses only; omit it on
+ * create.
+ */
+export interface GuardrailSpec {
+  type: "input" | "output";
+  scanner_type: string;
+  action?: string;
+  config?: Record<string, unknown>;
+  is_active?: boolean;
+  sort_order?: number;
+  id?: string;
 }
 
-export interface ApprovalRequest {
-  id: string;
-  execution_id: string;
-  workspace_id: string;
-  agent_id?: string;
-  checkpoint_name: string;
-  payload: Record<string, unknown>;
-  status: string;
-  reason?: string;
-  decided_by?: string;
-  decided_at?: string;
-  created_at: string;
+/** Metadata for an available guardrail scanner (`/guardrails/scanners`). */
+export interface ScannerMeta {
+  type: string;
+  label: string;
+  description: string;
+  category: string;
+  enabled: boolean;
+  config_fields: string[];
+  disabled_reason: string;
 }
 
 export interface ExecutionResult {
@@ -349,15 +382,16 @@ export interface UpdateAgentRequest {
 
 // === Agent config (discriminated union by agent type) ===
 //
-// Each agent.type has a different config shape. The SDK uses a discriminated
-// union so callers get compile-time autocompletion and catch renames like
-// prompt_version_id -> prompt_id at the type level.
-
-export interface PromptLink {
-  prompt_id: string;
-  role: string;
-  sort_order: number;
-}
+// API v2 has exactly two agent kinds:
+//   - `agent`    — a prompt plus optional tools / sub-agents (a supervisor when
+//     it has sub-agents). Built with `PromptAgentConfig`.
+//   - `workflow` — a deterministic DAG of nodes. Built with
+//     `WorkflowAgentConfig`.
+//
+// Model, sampling, budget, approval policy, cache TTL and tool/sub-agent
+// attachments are NOT part of `config` — they are version-scoped fields passed
+// alongside it to `createVersion` (see `ModelConfig`, `RunBudget`,
+// `ApprovalPolicy`, `ToolAttachment`, `SubAgentAttachment`, `GuardrailSpec`).
 
 export interface WorkflowNode {
   id: string;
@@ -370,53 +404,71 @@ export interface WorkflowNode {
   media_config?: Record<string, unknown>;
 }
 
-export interface CompositeStep {
-  id: string;
-  agent_id: string;
-  depends_on?: string[];
-  input_mapping?: Record<string, unknown>;
-}
-
-export interface SimpleAgentConfig {
-  type: "simple";
+/** Config for an `agent` — a single prompt (+ optional tools/sub-agents). */
+export interface PromptAgentConfig {
+  type: "agent";
   prompt_id: string;
-  approval_required?: boolean;
-  approval_checkpoint_name?: string;
-  max_tokens?: number;
-  temperature?: number;
-  llm_model_id?: string;
 }
 
-export interface ChainAgentConfig {
-  type: "chain";
-  prompt_ids: PromptLink[];
-  approval_required?: boolean;
-  approval_checkpoint_name?: string;
-}
-
-export interface MultiAgentConfig {
-  type: "multi_agent";
-  prompt_ids: PromptLink[];
-}
-
+/** Config for a `workflow` — a deterministic DAG of nodes. */
 export interface WorkflowAgentConfig {
   type: "workflow";
   nodes: WorkflowNode[];
 }
 
-export interface CompositeAgentConfig {
-  type: "composite";
-  steps: CompositeStep[];
-}
-
-export type AgentConfig =
-  | SimpleAgentConfig
-  | ChainAgentConfig
-  | MultiAgentConfig
-  | WorkflowAgentConfig
-  | CompositeAgentConfig;
+export type AgentConfig = PromptAgentConfig | WorkflowAgentConfig;
 
 export type AgentType = AgentConfig["type"];
+
+/** An MCP tool attached to an agent version with per-tool policy. */
+export interface ToolAttachment {
+  mcp_tool_id: string;
+  requires_approval?: boolean;
+  no_retry?: boolean;
+  sort_order?: number;
+}
+
+/** A delegate sub-agent attached to an agent version (agents-as-tools). */
+export interface SubAgentAttachment {
+  agent_id: string;
+  alias: string;
+  description?: string;
+  mode?: "delegate" | "handoff";
+  context_mode?: "task" | "window";
+  requires_approval?: boolean;
+  sort_order?: number;
+}
+
+/**
+ * Version-scoped model + sampling ownership. Every field is optional; unset
+ * sampling inherits the provider/model default.
+ */
+export interface ModelConfig {
+  model_id?: string;
+  fallback_model_id?: string;
+  temperature?: number;
+  top_p?: number;
+  top_k?: number;
+  max_tokens?: number;
+}
+
+/**
+ * Bounds the whole execution tree, enforced at the root. Every field is
+ * optional.
+ */
+export interface RunBudget {
+  max_cost?: number;
+  max_total_tokens?: number;
+  max_tool_calls?: number;
+  max_children?: number;
+  max_depth?: number;
+}
+
+/** Who may approve/deny a parked, approval-gated call. */
+export interface ApprovalPolicy {
+  mode?: "admins" | "assigned" | "any_member";
+  member_ids?: string[];
+}
 
 export interface CreateAgentVersionRequest {
   version: string;
@@ -425,6 +477,16 @@ export interface CreateAgentVersionRequest {
   output_schema?: Record<string, unknown>;
   set_current?: boolean;
   message?: string;
+  // Version-scoped runtime ownership (siblings of `config`).
+  model_config?: ModelConfig;
+  run_budget?: RunBudget;
+  approval_policy?: ApprovalPolicy;
+  cache_timeout?: number;
+  vfs_enabled?: boolean;
+  masking_enabled?: boolean;
+  tools?: ToolAttachment[];
+  sub_agents?: SubAgentAttachment[];
+  guardrails?: GuardrailSpec[];
 }
 
 // === Streaming events (emitted by the backend over SSE) ===
@@ -464,17 +526,16 @@ export interface UpdatePromptRequest {
   description?: string;
 }
 
+/**
+ * Create a content-only prompt version. Model, sampling, tools, output schema
+ * and cache TTL live on the agent version (see `CreateAgentVersionRequest`),
+ * not on the prompt.
+ */
 export interface CreatePromptVersionRequest {
   version: string;
   user_prompt: string;
   system_prompt?: string;
-  llm_model_id?: string;
-  fallback_llm_model_id?: string;
-  temperature?: number;
-  max_tokens?: number;
-  top_p?: number;
   input_schema?: Record<string, unknown>;
-  output_schema?: Record<string, unknown>;
   config?: Record<string, unknown>;
   set_current?: boolean;
   message?: string;
@@ -577,6 +638,8 @@ export interface CreateGuardrailRequest {
   scanner_type: string;
   action?: string;
   config?: Record<string, unknown>;
+  is_active?: boolean;
+  sort_order?: number;
 }
 
 export interface UpdateGuardrailRequest {
@@ -585,186 +648,9 @@ export interface UpdateGuardrailRequest {
   is_active?: boolean;
 }
 
-export interface DecideApprovalRequest {
-  decision: "approved" | "rejected";
-  reason?: string;
-}
-
 export interface ListParams {
   page?: number;
   limit?: number;
-}
-
-export interface RunPromptRequest {
-  system_prompt?: string;
-  user_prompt: string;
-  llm_model_id: string;
-  fallback_llm_model_id?: string;
-  temperature?: number;
-  max_tokens?: number;
-  top_p?: number;
-  top_k?: number;
-  input?: Record<string, unknown>;
-  output_schema?: Record<string, unknown>;
-  tools?: string[];
-  initial_messages?: Array<{ role: string; content: string }>;
-  credential_id?: string;
-  cache_timeout?: number;
-  /** Feature toggles, gated by the model's capability flags. */
-  reasoning_effort?: ReasoningEffort;
-  web_search?: boolean;
-  prompt_caching?: boolean;
-}
-
-/** Provider-agnostic reasoning effort levels (matches langrails ReasoningEffort). */
-export type ReasoningEffort = "minimal" | "low" | "medium" | "high";
-
-export interface RunPromptResponse {
-  content: string;
-  token_usage: Record<string, number>;
-  cost: number;
-  duration_ms: number;
-  model: string;
-}
-
-// --- Score ---
-
-export interface Score {
-  id: string;
-  workspace_id: string;
-  trace_id: string;
-  span_id: string;
-  name: string;
-  value?: number;
-  string_value: string;
-  data_type: string;
-  source: string;
-  config_id?: string;
-  comment: string;
-  created_by: string;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface ScoreConfig {
-  id: string;
-  workspace_id: string;
-  name: string;
-  data_type: string;
-  min_value?: number;
-  max_value?: number;
-  categories: Record<string, unknown>[];
-  description: string;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface ScoreAggregate {
-  name: string;
-  count: number;
-  avg: number;
-  min: number;
-  max: number;
-}
-
-export interface CreateScoreRequest {
-  trace_id: string;
-  name: string;
-  value?: number;
-  string_value?: string;
-  data_type?: string;
-  source?: string;
-  span_id?: string;
-  config_id?: string;
-  comment?: string;
-}
-
-export interface UpdateScoreRequest {
-  value?: number;
-  string_value?: string;
-  comment?: string;
-}
-
-export interface CreateScoreConfigRequest {
-  name: string;
-  data_type?: string;
-  min_value?: number;
-  max_value?: number;
-  categories?: Record<string, unknown>[];
-  description?: string;
-}
-
-export interface UpdateScoreConfigRequest {
-  name?: string;
-  description?: string;
-  min_value?: number;
-  max_value?: number;
-  is_active?: boolean;
-}
-
-// --- Dashboard ---
-
-export interface DashboardMetrics {
-  overview: {
-    total_executions: number;
-    total_cost: number;
-    total_tokens: number;
-    prompt_tokens: number;
-    cached_tokens: number;
-    cache_creation_tokens: number;
-    cache_savings: number;
-    cache_hit_rate: number;
-    total_agents: number;
-    error_count: number;
-    avg_duration_ms: number;
-  };
-  executions_by_day: { date: string; count: number }[];
-  cost_by_day: { date: string; cost: number }[];
-  cache_by_day: {
-    date: string;
-    prompt_tokens: number;
-    cached_tokens: number;
-    cache_creation_tokens: number;
-    cache_hit_rate: number;
-    savings: number;
-  }[];
-  agent_usage: {
-    agent_id: string;
-    agent_name: string;
-    executions: number;
-    total_cost: number;
-  }[];
-  model_usage: {
-    model_name: string;
-    count: number;
-    total_cost: number;
-    total_tokens: number;
-  }[];
-  error_rate: {
-    date: string;
-    total: number;
-    errors: number;
-    error_rate: number;
-  }[];
-  score_trends: {
-    date: string;
-    name: string;
-    average: number;
-    count: number;
-  }[];
-}
-
-// --- Session & User ---
-
-export interface SessionSummary {
-  session_id: string;
-  trace_count: number;
-  total_tokens: number;
-  total_cost: number;
-  error_count: number;
-  first_seen: string;
-  last_seen: string;
 }
 
 // --- A2A (Agent-to-Agent) ---
@@ -904,42 +790,6 @@ export interface AgentVFSReadResult {
 }
 
 export type AgentVFSWriteMode = "overwrite" | "append";
-
-// --- Media Models ---
-
-export interface MediaModel {
-  id: string;
-  provider: string;
-  model_id: string;
-  display_name: string;
-  media_type: string;
-  is_active: boolean;
-  is_deprecated: boolean;
-  deprecated_at?: string | null;
-  config?: Record<string, unknown>;
-  created_at: string;
-  updated_at: string;
-}
-
-// --- Media Studio ---
-
-export interface MediaGenerateRequest {
-  provider: string;
-  media_type: string;
-  model: string;
-  prompt?: string;
-  input_url?: string;
-  config?: Record<string, unknown>;
-  guardrails?: Record<string, unknown>;
-}
-
-export interface MediaGenerateResponse {
-  asset_id: string;
-  status: string;
-  url?: string;
-  execution_id?: string;
-  trace_id?: string;
-}
 
 // --- Assets ---
 
