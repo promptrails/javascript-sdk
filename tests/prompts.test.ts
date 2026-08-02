@@ -23,7 +23,7 @@ describe("PromptsResource", () => {
       data: [
         { id: "p1", name: "Prompt 1", status: "active", workspace_id: "ws" },
       ],
-      meta: { total: 1, page: 1, limit: 20, total_pages: 1 },
+      meta: { total: 1, page: 1, limit: 20, pages: 1 },
     });
 
     const result = await prompts.list();

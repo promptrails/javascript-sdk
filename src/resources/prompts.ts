@@ -1,13 +1,11 @@
-import { PaginatedResponse, parsePaginatedResponse } from "../pagination";
-import {
+import { type PaginatedResponse, parsePaginatedResponse } from "../pagination";
+import type {
+  CreatePromptRequest,
+  CreatePromptVersionRequest,
+  ListParams,
   Prompt,
   PromptVersion,
-  CreatePromptRequest,
   UpdatePromptRequest,
-  CreatePromptVersionRequest,
-  RunPromptRequest,
-  RunPromptResponse,
-  ListParams,
 } from "../types";
 
 import { BaseResource } from "./base";
@@ -83,16 +81,5 @@ export class PromptsResource extends BaseResource {
       data as unknown as Record<string, unknown>,
     );
     return this.unwrap(body) as Record<string, unknown>;
-  }
-
-  async runPrompt(
-    promptId: string,
-    data: RunPromptRequest,
-  ): Promise<RunPromptResponse> {
-    const body = await this.http.post(
-      `/api/v1/prompts/${promptId}/run`,
-      data as unknown as Record<string, unknown>,
-    );
-    return this.unwrap(body) as RunPromptResponse;
   }
 }

@@ -1,15 +1,15 @@
-import { PaginatedResponse, parsePaginatedResponse } from "../pagination";
-import {
+import { type PaginatedResponse, parsePaginatedResponse } from "../pagination";
+import type {
   Agent,
   AgentVersion,
+  CreateAgentRequest,
+  CreateAgentVersionRequest,
+  CreateGuardrailRequest,
+  ExecuteAgentRequest,
   ExecutionResult,
   Guardrail,
-  CreateAgentRequest,
-  UpdateAgentRequest,
-  CreateAgentVersionRequest,
-  ExecuteAgentRequest,
-  CreateGuardrailRequest,
   ListParams,
+  UpdateAgentRequest,
 } from "../types";
 
 import { BaseResource } from "./base";
@@ -98,6 +98,27 @@ export class AgentsResource extends BaseResource {
   ): Promise<Record<string, unknown>> {
     const body = await this.http.post(
       `/api/v1/agents/${agentId}/preview`,
+      data as unknown as Record<string, unknown>,
+    );
+    return this.unwrap(body) as Record<string, unknown>;
+  }
+
+  /**
+   * Run the agent with an ad-hoc prompt override without saving a version.
+   * `prompt_override` may carry `system_prompt`, `user_prompt` and
+   * `input_schema`. `version_id` selects whose runtime behavior is used
+   * (defaults to the current version).
+   */
+  async playground(
+    agentId: string,
+    data: {
+      input: Record<string, unknown>;
+      prompt_override: Record<string, unknown>;
+      version_id?: string;
+    },
+  ): Promise<Record<string, unknown>> {
+    const body = await this.http.post(
+      `/api/v1/agents/${agentId}/playground`,
       data as unknown as Record<string, unknown>,
     );
     return this.unwrap(body) as Record<string, unknown>;

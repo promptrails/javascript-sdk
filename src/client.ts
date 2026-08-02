@@ -1,29 +1,21 @@
-import { ClientOptions, resolveConfig } from "./config";
+import { type ClientOptions, resolveConfig } from "./config";
 import { HTTPClient } from "./http";
 import {
-  AgentsResource,
-  PromptsResource,
-  ExecutionsResource,
-  CredentialsResource,
-  DataSourcesResource,
-  ChatResource,
-  TracesResource,
-  CostsResource,
-  MCPToolsResource,
-  MCPTemplatesResource,
-  GuardrailsResource,
-  ApprovalsResource,
-  TemplatesResource,
-  ScoresResource,
-  DashboardResource,
-  SessionsResource,
   A2AResource,
-  LLMModelsResource,
+  AgentsResource,
   AgentTriggersResource,
   AgentVFSResource,
-  MediaModelsResource,
-  MediaResource,
   AssetsResource,
+  ChatResource,
+  CredentialsResource,
+  DataSourcesResource,
+  ExecutionsResource,
+  GuardrailsResource,
+  LLMModelsResource,
+  MCPTemplatesResource,
+  MCPToolsResource,
+  PromptsResource,
+  TracesResource,
 } from "./resources";
 
 export class PromptRails {
@@ -34,21 +26,13 @@ export class PromptRails {
   public readonly dataSources: DataSourcesResource;
   public readonly chat: ChatResource;
   public readonly traces: TracesResource;
-  public readonly costs: CostsResource;
   public readonly mcpTools: MCPToolsResource;
   public readonly mcpTemplates: MCPTemplatesResource;
   public readonly guardrails: GuardrailsResource;
-  public readonly approvals: ApprovalsResource;
-  public readonly templates: TemplatesResource;
-  public readonly scores: ScoresResource;
-  public readonly dashboard: DashboardResource;
-  public readonly sessions: SessionsResource;
   public readonly a2a: A2AResource;
   public readonly llmModels: LLMModelsResource;
   public readonly agentTriggers: AgentTriggersResource;
   public readonly agentVfs: AgentVFSResource;
-  public readonly mediaModels: MediaModelsResource;
-  public readonly media: MediaResource;
   public readonly assets: AssetsResource;
 
   constructor(options: ClientOptions) {
@@ -62,21 +46,13 @@ export class PromptRails {
     this.dataSources = new DataSourcesResource(http);
     this.chat = new ChatResource(http);
     this.traces = new TracesResource(http);
-    this.costs = new CostsResource(http);
     this.mcpTools = new MCPToolsResource(http);
     this.mcpTemplates = new MCPTemplatesResource(http);
     this.guardrails = new GuardrailsResource(http);
-    this.approvals = new ApprovalsResource(http);
-    this.templates = new TemplatesResource(http);
-    this.scores = new ScoresResource(http);
-    this.dashboard = new DashboardResource(http);
-    this.sessions = new SessionsResource(http);
     this.a2a = new A2AResource(http);
     this.llmModels = new LLMModelsResource(http);
     this.agentTriggers = new AgentTriggersResource(http);
     this.agentVfs = new AgentVFSResource(http);
-    this.mediaModels = new MediaModelsResource(http);
-    this.media = new MediaResource(http);
     this.assets = new AssetsResource(http);
   }
 }

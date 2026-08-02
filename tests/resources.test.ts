@@ -1,12 +1,10 @@
-import { HTTPClient } from "../src/http";
+import type { HTTPClient } from "../src/http";
 import { A2AResource } from "../src/resources/a2a";
 import { AgentVFSResource } from "../src/resources/agentVfs";
 import { AssetsResource } from "../src/resources/assets";
-import { CostsResource } from "../src/resources/costs";
 import { CredentialsResource } from "../src/resources/credentials";
 import { DataSourcesResource } from "../src/resources/dataSources";
 import { MCPToolsResource } from "../src/resources/mcpTools";
-import { ScoresResource } from "../src/resources/scores";
 
 function makeMock() {
   const http = {
@@ -49,6 +47,8 @@ describe("A2AResource", () => {
       limit: 20,
     });
     expect(res.data).toHaveLength(1);
+    // listBody emits legacy `total_pages` — the parser falls back to it.
+    expect(res.meta.pages).toBe(1);
   });
 
   it("cancelTask posts a JSON-RPC body and unwraps result", async () => {
@@ -106,72 +106,6 @@ describe("AgentVFSResource", () => {
     const used = await vfs.usage("ag1");
     expect(http.get).toHaveBeenCalledWith("/api/v1/agents/ag1/vfs/usage");
     expect(used).toBe(42);
-  });
-});
-
-describe("ScoresResource", () => {
-  let http: ReturnType<typeof makeMock>;
-  let scores: ScoresResource;
-  beforeEach(() => {
-    http = makeMock();
-    scores = new ScoresResource(http);
-  });
-
-  it("create posts a score", async () => {
-    http.post.mockResolvedValue({ data: { id: "s1" } });
-    await scores.create({ execution_id: "e1", value: 1 } as never);
-    expect(http.post).toHaveBeenCalledWith(
-      "/api/v1/scores",
-      expect.any(Object),
-    );
-  });
-
-  it("update patches a score", async () => {
-    http.patch.mockResolvedValue({ data: { id: "s1" } });
-    await scores.update("s1", { value: 0.5 } as never);
-    expect(http.patch).toHaveBeenCalledWith(
-      "/api/v1/scores/s1",
-      expect.any(Object),
-    );
-  });
-
-  it("delete removes a score", async () => {
-    http.delete.mockResolvedValue({});
-    await scores.delete("s1");
-    expect(http.delete).toHaveBeenCalledWith("/api/v1/scores/s1");
-  });
-
-  it("score configs use the score-configs endpoint", async () => {
-    http.get.mockResolvedValue(listBody);
-    await scores.listConfigs();
-    expect(http.get).toHaveBeenCalledWith(
-      "/api/v1/score-configs",
-      expect.any(Object),
-    );
-
-    http.get.mockResolvedValue({ data: { id: "cfg1" } });
-    await scores.getConfig("cfg1");
-    expect(http.get).toHaveBeenCalledWith("/api/v1/score-configs/cfg1");
-  });
-});
-
-describe("CostsResource", () => {
-  it("getSummary and getAgentSummary hit the cost endpoints", async () => {
-    const http = makeMock();
-    const costs = new CostsResource(http);
-
-    http.get.mockResolvedValue({ data: { total_cost: 1 } });
-    await costs.getSummary();
-    expect(http.get).toHaveBeenCalledWith(
-      "/api/v1/costs/summary",
-      expect.any(Object),
-    );
-
-    await costs.getAgentSummary("ag1");
-    expect(http.get).toHaveBeenCalledWith(
-      "/api/v1/costs/agents/ag1",
-      expect.any(Object),
-    );
   });
 });
 

@@ -2,7 +2,7 @@ export interface PaginationMeta {
   total: number;
   page: number;
   limit: number;
-  total_pages: number;
+  pages: number;
 }
 
 export interface PaginatedResponse<T> {
@@ -21,7 +21,8 @@ export function parsePaginatedResponse<T>(
       total: rawMeta.total || 0,
       page: rawMeta.page || 1,
       limit: rawMeta.limit || 20,
-      total_pages: rawMeta.total_pages || 0,
+      // API v2 standardizes on `pages`; older payloads used `total_pages`.
+      pages: rawMeta.pages ?? rawMeta.total_pages ?? 0,
     },
   };
 }
