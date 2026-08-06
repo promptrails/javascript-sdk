@@ -45,7 +45,7 @@ try {
 | `client.executions`      | `list`, `get`, `tree`, `cancel`, `approvalInbox`, `approve`, `deny`, `stream` |
 | `client.credentials`     | `list`, `get`, `create`, `update`, `delete`, `setDefault`, `checkConnection` |
 | `client.dataSources`     | `list`, `get`, `create`, `update`, `delete`, `listVersions`, `createVersion`, `testConnection`, `query` |
-| `client.chat`            | `listSessions`, `getSession`, `createSession`, `deleteSession`, `listMessages`, `sendMessage` |
+| `client.chat`            | `listSessions`, `getSession`, `createSession`, `deleteSession`, `listMessages`, `sendMessage`, `sendMessageStream`, `submitFeedback` |
 | `client.traces`          | `list`, `getByTraceId`, `getSummary`, `piiReport`, `ingest`             |
 | `client.mcpTools`        | `list`, `get`, `create`, `update`, `delete`                              |
 | `client.mcpTemplates`    | `list`, `get`, `getBySlug`, `install`                                    |
@@ -55,6 +55,11 @@ try {
 | `client.agentVfs`        | `list`, `read`, `write`, `stat`, `mkdir`, `move`, `copy`, `delete`, `grep`, `glob`, `usage` |
 | `client.assets`          | `list`, `get`, `delete`, `getSignedUrl`                                  |
 | `client.a2a`             | `getAgentCard`, `sendMessage`, `getTask`, `listTasks`, `cancelTask`      |
+
+The browser-only `/api/v1/browser/chat/*` token and resume protocol is exposed
+by [`@promptrails/ai-chat`](https://github.com/promptrails/ai-chat), which is
+designed for publishable origin-restricted keys. This server-key SDK does not
+send long-lived PromptRails credentials to browser applications.
 
 ## Agents (API v2)
 

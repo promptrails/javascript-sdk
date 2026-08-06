@@ -31,6 +31,8 @@ export {
   AvailableModelEntry,
   AvailableModelGroup,
   CallMCPToolRequest,
+  ChatFeedbackRequest,
+  ChatFeedbackResponse,
   ChatMessage,
   ChatSession,
   CreateAgentRequest,

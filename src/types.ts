@@ -585,6 +585,15 @@ export interface SendMessageRequest {
   content: string;
 }
 
+export interface ChatFeedbackRequest {
+  execution_id: string;
+  value: -1 | 1;
+}
+
+export interface ChatFeedbackResponse {
+  submitted: boolean;
+}
+
 export interface CreateMCPToolRequest {
   name: string;
   type: string;

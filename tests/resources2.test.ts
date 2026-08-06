@@ -58,6 +58,21 @@ describe("ChatResource", () => {
     );
   });
 
+  it("submitFeedback posts a typed score to the session", async () => {
+    http.post.mockResolvedValue({ data: { submitted: true } });
+
+    const result = await chat.submitFeedback("s1", {
+      execution_id: "exec1",
+      value: 1,
+    });
+
+    expect(http.post).toHaveBeenCalledWith(
+      "/api/v1/chat/sessions/s1/feedback",
+      { execution_id: "exec1", value: 1 },
+    );
+    expect(result).toEqual({ submitted: true });
+  });
+
   it("deleteSession deletes the session", async () => {
     http.delete.mockResolvedValue({});
     await chat.deleteSession("s1");

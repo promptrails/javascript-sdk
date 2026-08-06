@@ -3,6 +3,8 @@ import { parseSSEStream } from "../sse";
 import {
   ChatSession,
   ChatMessage,
+  ChatFeedbackRequest,
+  ChatFeedbackResponse,
   CreateChatSessionRequest,
   SendMessageRequest,
   ListParams,
@@ -62,6 +64,21 @@ export class ChatResource extends BaseResource {
       data as unknown as Record<string, unknown>,
     );
     return this.unwrap(body) as ChatMessage;
+  }
+
+  /**
+   * Submit or update thumbs-up/down feedback for an execution in this
+   * session. Repeating the call for the same execution updates the score.
+   */
+  async submitFeedback(
+    sessionId: string,
+    data: ChatFeedbackRequest,
+  ): Promise<ChatFeedbackResponse> {
+    const body = await this.http.post(
+      `/api/v1/chat/sessions/${sessionId}/feedback`,
+      data as unknown as Record<string, unknown>,
+    );
+    return this.unwrap(body) as ChatFeedbackResponse;
   }
 
   /**
