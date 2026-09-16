@@ -1,4 +1,4 @@
-import {
+import type {
   AgentVFSFile,
   AgentVFSGrepMatch,
   AgentVFSReadResult,
@@ -40,10 +40,7 @@ export class AgentVFSResource extends BaseResource {
     const params: Record<string, string | number> = { path };
     if (opts.lineOffset != null) params.line_offset = opts.lineOffset;
     if (opts.lineLimit != null) params.line_limit = opts.lineLimit;
-    const body = await this.http.get(
-      `/api/v1/agents/${agentId}/vfs/file`,
-      params,
-    );
+    const body = await this.http.get(`/api/v1/agents/${agentId}/vfs/file`, params);
     return this.unwrap(body) as AgentVFSReadResult;
   }
 
@@ -59,10 +56,7 @@ export class AgentVFSResource extends BaseResource {
       mode: opts.mode ?? "overwrite",
     };
     if (opts.mimeType) payload.mime_type = opts.mimeType;
-    const body = await this.http.put(
-      `/api/v1/agents/${agentId}/vfs/file`,
-      payload,
-    );
+    const body = await this.http.put(`/api/v1/agents/${agentId}/vfs/file`, payload);
     return this.unwrap(body) as AgentVFSFile;
   }
 
@@ -88,16 +82,10 @@ export class AgentVFSResource extends BaseResource {
     await this.http.post(`/api/v1/agents/${agentId}/vfs/copy`, { from, to });
   }
 
-  async delete(
-    agentId: string,
-    path: string,
-    opts: { recursive?: boolean } = {},
-  ): Promise<number> {
+  async delete(agentId: string, path: string, opts: { recursive?: boolean } = {}): Promise<number> {
     const qs = new URLSearchParams({ path });
     if (opts.recursive) qs.set("recursive", "true");
-    const body = await this.http.delete(
-      `/api/v1/agents/${agentId}/vfs?${qs.toString()}`,
-    );
+    const body = await this.http.delete(`/api/v1/agents/${agentId}/vfs?${qs.toString()}`);
     const data = (this.unwrap(body) as { deleted?: number }) ?? {};
     return data.deleted ?? 0;
   }
@@ -110,10 +98,7 @@ export class AgentVFSResource extends BaseResource {
     const params: Record<string, string | number> = { q: query };
     if (opts.path) params.path = opts.path;
     if (opts.limit != null) params.limit = opts.limit;
-    const body = await this.http.get(
-      `/api/v1/agents/${agentId}/vfs/grep`,
-      params,
-    );
+    const body = await this.http.get(`/api/v1/agents/${agentId}/vfs/grep`, params);
     const data = this.unwrap(body) as { matches?: AgentVFSGrepMatch[] };
     return data.matches ?? [];
   }
@@ -126,10 +111,7 @@ export class AgentVFSResource extends BaseResource {
     const params: Record<string, string | number> = { pattern };
     if (opts.path) params.path = opts.path;
     if (opts.limit != null) params.limit = opts.limit;
-    const body = await this.http.get(
-      `/api/v1/agents/${agentId}/vfs/glob`,
-      params,
-    );
+    const body = await this.http.get(`/api/v1/agents/${agentId}/vfs/glob`, params);
     const data = this.unwrap(body) as { items?: AgentVFSFile[] };
     return data.items ?? [];
   }

@@ -1,5 +1,5 @@
-import { PaginatedResponse, parsePaginatedResponse } from "../pagination";
-import { Asset, AssetSignedUrl, ListParams } from "../types";
+import { type PaginatedResponse, parsePaginatedResponse } from "../pagination";
+import type { Asset, AssetSignedUrl, ListParams } from "../types";
 
 import { BaseResource } from "./base";
 

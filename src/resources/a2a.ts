@@ -1,5 +1,5 @@
-import { PaginatedResponse, parsePaginatedResponse } from "../pagination";
-import { A2AAgentCard, A2ATask, ListParams } from "../types";
+import { type PaginatedResponse, parsePaginatedResponse } from "../pagination";
+import type { A2AAgentCard, A2ATask, ListParams } from "../types";
 
 import { BaseResource } from "./base";
 

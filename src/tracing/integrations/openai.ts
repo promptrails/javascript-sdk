@@ -15,8 +15,8 @@
  * `model`/`usage`/`choices` off the response, so it works with any
  * API-compatible client. */
 
-import { Span } from "../span";
-import { Tracer } from "../tracer";
+import type { Span } from "../span";
+import type { Tracer } from "../tracer";
 
 interface Usage {
   prompt_tokens?: number;
@@ -33,10 +33,7 @@ interface ChatResponse {
 }
 
 // Minimal shape we patch — kept loose so any OpenAI-compatible client works.
-type CreateFn = (params: {
-  model?: string;
-  messages?: unknown;
-}) => Promise<ChatResponse>;
+type CreateFn = (params: { model?: string; messages?: unknown }) => Promise<ChatResponse>;
 interface OpenAILike {
   chat: { completions: { create: CreateFn } };
 }
@@ -53,8 +50,7 @@ export function traceOpenAI<T extends OpenAILike>(
   completions.create = (params) =>
     tracer.span(spanName, { kind: "llm" }, async (span) => {
       if (params.model) span.setModel(params.model);
-      if (params.messages !== undefined)
-        span.setInput({ messages: params.messages });
+      if (params.messages !== undefined) span.setInput({ messages: params.messages });
       const response = await original(params);
       applyResponse(span, response);
       return response;

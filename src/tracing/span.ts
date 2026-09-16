@@ -100,18 +100,10 @@ export class Span {
     return this;
   }
 
-  setUsage(
-    promptTokens?: number,
-    completionTokens?: number,
-    totalTokens?: number,
-  ): this {
+  setUsage(promptTokens?: number, completionTokens?: number, totalTokens?: number): this {
     this.promptTokens = promptTokens;
     this.completionTokens = completionTokens;
-    if (
-      totalTokens === undefined &&
-      promptTokens !== undefined &&
-      completionTokens !== undefined
-    ) {
+    if (totalTokens === undefined && promptTokens !== undefined && completionTokens !== undefined) {
       totalTokens = promptTokens + completionTokens;
     }
     this.totalTokens = totalTokens;
@@ -162,14 +154,11 @@ export class Span {
     if (this.endedAt) payload.ended_at = this.endedAt.toISOString();
     if (this.input !== undefined) payload.input = this.input;
     if (this.output !== undefined) payload.output = this.output;
-    if (Object.keys(this.attributes).length > 0)
-      payload.attributes = this.attributes;
+    if (Object.keys(this.attributes).length > 0) payload.attributes = this.attributes;
     if (this.tags.length > 0) payload.tags = this.tags;
     if (this.modelName) payload.model_name = this.modelName;
-    if (this.promptTokens !== undefined)
-      payload.prompt_tokens = this.promptTokens;
-    if (this.completionTokens !== undefined)
-      payload.completion_tokens = this.completionTokens;
+    if (this.promptTokens !== undefined) payload.prompt_tokens = this.promptTokens;
+    if (this.completionTokens !== undefined) payload.completion_tokens = this.completionTokens;
     if (this.totalTokens !== undefined) payload.total_tokens = this.totalTokens;
     if (this.cost !== undefined) payload.cost = this.cost;
     if (this.sessionId) payload.session_id = this.sessionId;

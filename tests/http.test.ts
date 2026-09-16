@@ -1,4 +1,4 @@
-import { Config } from "../src/config";
+import type { Config } from "../src/config";
 import { NotFoundError, RateLimitError, ServerError } from "../src/errors";
 import { HTTPClient } from "../src/http";
 
@@ -122,19 +122,15 @@ describe("HTTPClient", () => {
 
       expect(out).toBe(resp);
       const opts = fetchMock.mock.calls[0][1];
-      expect(opts.headers["Accept"]).toBe("text/event-stream");
+      expect(opts.headers.Accept).toBe("text/event-stream");
       expect(opts.body).toBe(JSON.stringify({ content: "hi" }));
     });
 
     it("raises a typed error on a non-ok stream open", async () => {
-      fetchMock.mockResolvedValue(
-        mockResponse(404, { error: { message: "nope" } }),
-      );
+      fetchMock.mockResolvedValue(mockResponse(404, { error: { message: "nope" } }));
       const http = new HTTPClient(makeConfig());
 
-      await expect(http.stream("GET", "/x/stream")).rejects.toBeInstanceOf(
-        NotFoundError,
-      );
+      await expect(http.stream("GET", "/x/stream")).rejects.toBeInstanceOf(NotFoundError);
     });
   });
 });

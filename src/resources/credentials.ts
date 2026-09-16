@@ -1,9 +1,9 @@
-import { PaginatedResponse, parsePaginatedResponse } from "../pagination";
-import {
-  Credential,
+import { type PaginatedResponse, parsePaginatedResponse } from "../pagination";
+import type {
   CreateCredentialRequest,
-  UpdateCredentialRequest,
+  Credential,
   ListParams,
+  UpdateCredentialRequest,
 } from "../types";
 
 import { BaseResource } from "./base";
@@ -30,10 +30,7 @@ export class CredentialsResource extends BaseResource {
     return this.unwrap(body) as Credential;
   }
 
-  async update(
-    credentialId: string,
-    data: UpdateCredentialRequest,
-  ): Promise<Credential> {
+  async update(credentialId: string, data: UpdateCredentialRequest): Promise<Credential> {
     const body = await this.http.patch(
       `/api/v1/credentials/${credentialId}`,
       data as unknown as Record<string, unknown>,
@@ -46,18 +43,12 @@ export class CredentialsResource extends BaseResource {
   }
 
   async setDefault(credentialId: string): Promise<Credential> {
-    const body = await this.http.post(
-      `/api/v1/credentials/${credentialId}/set-default`,
-    );
+    const body = await this.http.post(`/api/v1/credentials/${credentialId}/set-default`);
     return this.unwrap(body) as Credential;
   }
 
-  async checkConnection(
-    credentialId: string,
-  ): Promise<Record<string, unknown>> {
-    const body = await this.http.post(
-      `/api/v1/credentials/${credentialId}/check`,
-    );
+  async checkConnection(credentialId: string): Promise<Record<string, unknown>> {
+    const body = await this.http.post(`/api/v1/credentials/${credentialId}/check`);
     return this.unwrap(body) as Record<string, unknown>;
   }
 }

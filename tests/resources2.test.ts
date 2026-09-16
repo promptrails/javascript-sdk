@@ -34,28 +34,19 @@ describe("ChatResource", () => {
   it("listSessions hits the sessions endpoint", async () => {
     http.get.mockResolvedValue(listBody);
     await chat.listSessions();
-    expect(http.get).toHaveBeenCalledWith(
-      "/api/v1/chat/sessions",
-      expect.any(Object),
-    );
+    expect(http.get).toHaveBeenCalledWith("/api/v1/chat/sessions", expect.any(Object));
   });
 
   it("createSession posts a session", async () => {
     http.post.mockResolvedValue({ data: { id: "s1" } });
     await chat.createSession({ agent_id: "a1" } as never);
-    expect(http.post).toHaveBeenCalledWith(
-      "/api/v1/chat/sessions",
-      expect.any(Object),
-    );
+    expect(http.post).toHaveBeenCalledWith("/api/v1/chat/sessions", expect.any(Object));
   });
 
   it("sendMessage posts to the messages endpoint", async () => {
     http.post.mockResolvedValue({ data: { id: "m1" } });
     await chat.sendMessage("s1", { content: "hi" } as never);
-    expect(http.post).toHaveBeenCalledWith(
-      "/api/v1/chat/sessions/s1/messages",
-      expect.any(Object),
-    );
+    expect(http.post).toHaveBeenCalledWith("/api/v1/chat/sessions/s1/messages", expect.any(Object));
   });
 
   it("submitFeedback posts a typed score to the session", async () => {
@@ -66,10 +57,10 @@ describe("ChatResource", () => {
       value: 1,
     });
 
-    expect(http.post).toHaveBeenCalledWith(
-      "/api/v1/chat/sessions/s1/feedback",
-      { execution_id: "exec1", value: 1 },
-    );
+    expect(http.post).toHaveBeenCalledWith("/api/v1/chat/sessions/s1/feedback", {
+      execution_id: "exec1",
+      value: 1,
+    });
     expect(result).toEqual({ submitted: true });
   });
 
@@ -111,10 +102,7 @@ describe("GuardrailsResource", () => {
 
     http.patch.mockResolvedValue({ data: { id: "g1" } });
     await guardrails.update("g1", {} as never);
-    expect(http.patch).toHaveBeenCalledWith(
-      "/api/v1/guardrails/g1",
-      expect.any(Object),
-    );
+    expect(http.patch).toHaveBeenCalledWith("/api/v1/guardrails/g1", expect.any(Object));
 
     http.delete.mockResolvedValue({});
     await guardrails.delete("g1");
@@ -129,10 +117,7 @@ describe("LLMModelsResource", () => {
 
     http.get.mockResolvedValue(listBody);
     await models.list();
-    expect(http.get).toHaveBeenCalledWith(
-      "/api/v1/llm-models",
-      expect.any(Object),
-    );
+    expect(http.get).toHaveBeenCalledWith("/api/v1/llm-models", expect.any(Object));
 
     http.get.mockResolvedValue({ data: { groups: [] } });
     await models.listAvailable();
@@ -166,24 +151,15 @@ describe("AgentTriggersResource", () => {
   it("CRUD hits the triggers endpoints", async () => {
     http.get.mockResolvedValue(listBody);
     await triggers.list();
-    expect(http.get).toHaveBeenCalledWith(
-      "/api/v1/triggers",
-      expect.any(Object),
-    );
+    expect(http.get).toHaveBeenCalledWith("/api/v1/triggers", expect.any(Object));
 
     http.post.mockResolvedValue({ data: { id: "t1" } });
     await triggers.create({} as never);
-    expect(http.post).toHaveBeenCalledWith(
-      "/api/v1/triggers",
-      expect.any(Object),
-    );
+    expect(http.post).toHaveBeenCalledWith("/api/v1/triggers", expect.any(Object));
 
     http.patch.mockResolvedValue({ data: { id: "t1" } });
     await triggers.update("t1", {} as never);
-    expect(http.patch).toHaveBeenCalledWith(
-      "/api/v1/triggers/t1",
-      expect.any(Object),
-    );
+    expect(http.patch).toHaveBeenCalledWith("/api/v1/triggers/t1", expect.any(Object));
 
     http.delete.mockResolvedValue({});
     await triggers.delete("t1");

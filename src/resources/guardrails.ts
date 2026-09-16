@@ -10,10 +10,7 @@ export class GuardrailsResource extends BaseResource {
     return Array.isArray(data) ? (data as ScannerMeta[]) : [];
   }
 
-  async update(
-    guardrailId: string,
-    data: UpdateGuardrailRequest,
-  ): Promise<Guardrail> {
+  async update(guardrailId: string, data: UpdateGuardrailRequest): Promise<Guardrail> {
     const body = await this.http.patch(
       `/api/v1/guardrails/${guardrailId}`,
       data as unknown as Record<string, unknown>,

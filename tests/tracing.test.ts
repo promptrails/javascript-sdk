@@ -1,4 +1,4 @@
-import { HTTPClient } from "../src/http";
+import type { HTTPClient } from "../src/http";
 import { Span } from "../src/tracing/span";
 import { Tracer } from "../src/tracing/tracer";
 
@@ -15,9 +15,7 @@ function mockHttp() {
 
 function postedSpans(http: HTTPClient): Record<string, unknown>[] {
   const calls = (http.post as jest.Mock).mock.calls;
-  return calls.flatMap(
-    (c) => (c[1] as { json: { spans: Record<string, unknown>[] } }).json.spans,
-  );
+  return calls.flatMap((c) => (c[1] as { json: { spans: Record<string, unknown>[] } }).json.spans);
 }
 
 function tracer(http: HTTPClient): Tracer {

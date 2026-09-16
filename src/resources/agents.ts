@@ -34,10 +34,7 @@ export class AgentsResource extends BaseResource {
   }
 
   async create(data: CreateAgentRequest): Promise<Agent> {
-    const body = await this.http.post(
-      "/api/v1/agents",
-      data as unknown as Record<string, unknown>,
-    );
+    const body = await this.http.post("/api/v1/agents", data as unknown as Record<string, unknown>);
     return this.unwrap(body) as Agent;
   }
 
@@ -53,10 +50,7 @@ export class AgentsResource extends BaseResource {
     await this.http.delete(`/api/v1/agents/${agentId}`);
   }
 
-  async execute(
-    agentId: string,
-    data: ExecuteAgentRequest,
-  ): Promise<ExecutionResult> {
+  async execute(agentId: string, data: ExecuteAgentRequest): Promise<ExecutionResult> {
     const body = await this.http.post(
       `/api/v1/agents/${agentId}/execute`,
       data as unknown as Record<string, unknown>,
@@ -70,10 +64,7 @@ export class AgentsResource extends BaseResource {
     return Array.isArray(data) ? data : [];
   }
 
-  async createVersion(
-    agentId: string,
-    data: CreateAgentVersionRequest,
-  ): Promise<AgentVersion> {
+  async createVersion(agentId: string, data: CreateAgentVersionRequest): Promise<AgentVersion> {
     const body = await this.http.post(
       `/api/v1/agents/${agentId}/versions`,
       data as unknown as Record<string, unknown>,
@@ -81,14 +72,8 @@ export class AgentsResource extends BaseResource {
     return this.unwrap(body) as AgentVersion;
   }
 
-  async promoteVersion(
-    agentId: string,
-    versionId: string,
-  ): Promise<Record<string, unknown>> {
-    const body = await this.http.put(
-      `/api/v1/agents/${agentId}/versions/${versionId}/promote`,
-      {},
-    );
+  async promoteVersion(agentId: string, versionId: string): Promise<Record<string, unknown>> {
+    const body = await this.http.put(`/api/v1/agents/${agentId}/versions/${versionId}/promote`, {});
     return this.unwrap(body) as Record<string, unknown>;
   }
 
@@ -130,10 +115,7 @@ export class AgentsResource extends BaseResource {
     return Array.isArray(data) ? data : [];
   }
 
-  async createGuardrail(
-    agentId: string,
-    data: CreateGuardrailRequest,
-  ): Promise<Guardrail> {
+  async createGuardrail(agentId: string, data: CreateGuardrailRequest): Promise<Guardrail> {
     const body = await this.http.post(
       `/api/v1/agents/${agentId}/guardrails`,
       data as unknown as Record<string, unknown>,

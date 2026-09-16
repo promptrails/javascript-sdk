@@ -4,8 +4,8 @@
  * process exits. Export is best-effort: failures are logged and dropped rather
  * than thrown into the caller's code, and the buffer is bounded. */
 
-import { HTTPClient } from "../http";
-import { SpanPayload } from "./span";
+import type { HTTPClient } from "../http";
+import type { SpanPayload } from "./span";
 
 export const INGEST_PATH = "/api/v1/traces/ingest";
 
@@ -80,10 +80,7 @@ export class SpanExporter {
     try {
       await this.http.post(INGEST_PATH, { json: { spans } });
     } catch (err) {
-      console.warn(
-        `promptrails trace export failed (${spans.length} spans):`,
-        err,
-      );
+      console.warn(`promptrails trace export failed (${spans.length} spans):`, err);
     }
   }
 }

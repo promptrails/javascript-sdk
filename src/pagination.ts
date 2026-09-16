@@ -10,9 +10,7 @@ export interface PaginatedResponse<T> {
   meta: PaginationMeta;
 }
 
-export function parsePaginatedResponse<T>(
-  body: Record<string, unknown>,
-): PaginatedResponse<T> {
+export function parsePaginatedResponse<T>(body: Record<string, unknown>): PaginatedResponse<T> {
   const data = (body.data as T[]) || [];
   const rawMeta = (body.meta as Record<string, number>) || {};
   return {

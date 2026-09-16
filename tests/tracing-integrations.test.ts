@@ -1,4 +1,4 @@
-import { HTTPClient } from "../src/http";
+import type { HTTPClient } from "../src/http";
 import { traceAnthropic } from "../src/tracing/integrations/anthropic";
 import { traceGoogle } from "../src/tracing/integrations/google";
 import { PromptRailsCallbackHandler } from "../src/tracing/integrations/langchain";
@@ -19,9 +19,7 @@ function mockHttp() {
 
 function postedSpans(http: HTTPClient): Record<string, unknown>[] {
   const calls = (http.post as jest.Mock).mock.calls;
-  return calls.flatMap(
-    (c) => (c[1] as { json: { spans: Record<string, unknown>[] } }).json.spans,
-  );
+  return calls.flatMap((c) => (c[1] as { json: { spans: Record<string, unknown>[] } }).json.spans);
 }
 
 function tracer(http: HTTPClient): Tracer {
@@ -35,12 +33,7 @@ describe("LangChain handler", () => {
     const handler = new PromptRailsCallbackHandler(t);
 
     handler.handleChainStart({ name: "AgentExecutor" }, { q: "hi" }, "chain-1");
-    handler.handleLLMStart(
-      { name: "ChatOpenAI" },
-      ["prompt"],
-      "llm-1",
-      "chain-1",
-    );
+    handler.handleLLMStart({ name: "ChatOpenAI" }, ["prompt"], "llm-1", "chain-1");
     handler.handleLLMEnd(
       {
         llmOutput: {
@@ -55,8 +48,8 @@ describe("LangChain handler", () => {
     await t.shutdown();
 
     const spans = Object.fromEntries(postedSpans(http).map((s) => [s.name, s]));
-    const chain = spans["AgentExecutor"] as Record<string, unknown>;
-    const llm = spans["ChatOpenAI"] as Record<string, unknown>;
+    const chain = spans.AgentExecutor as Record<string, unknown>;
+    const llm = spans.ChatOpenAI as Record<string, unknown>;
     expect(chain.trace_id).toBe(llm.trace_id);
     expect(chain.parent_span_id).toBeUndefined();
     expect(llm.parent_span_id).toBe(chain.span_id);
@@ -125,11 +118,7 @@ describe("traceAnthropic", () => {
     const t = tracer(http);
     const client = {
       messages: {
-        create: async (_params: {
-          model?: string;
-          messages?: unknown;
-          system?: unknown;
-        }) => ({
+        create: async (_params: { model?: string; messages?: unknown; system?: unknown }) => ({
           model: "claude-sonnet-4-5",
           usage: { input_tokens: 30, output_tokens: 9 },
           content: [{ text: "hi there" }],
@@ -161,10 +150,7 @@ describe("traceGoogle", () => {
     const t = tracer(http);
     const client = {
       models: {
-        generateContent: async (_params: {
-          model?: string;
-          contents?: unknown;
-        }) => ({
+        generateContent: async (_params: { model?: string; contents?: unknown }) => ({
           text: "hello from gemini",
           modelVersion: "gemini-2.0-flash",
           usageMetadata: {

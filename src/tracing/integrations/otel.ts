@@ -12,10 +12,10 @@
  * dependency on `@opentelemetry/*`). `gen_ai.*` semantic-convention attributes
  * are mapped onto the PromptRails span model. */
 
-import { ClientOptions, resolveConfig } from "../../config";
+import { type ClientOptions, resolveConfig } from "../../config";
 import { HTTPClient } from "../../http";
 import { INGEST_PATH } from "../exporter";
-import { SpanPayload } from "../span";
+import type { SpanPayload } from "../span";
 
 // [seconds, nanoseconds]
 type HrTime = [number, number];
@@ -58,10 +58,7 @@ export class PromptRailsSpanExporter {
     }
   }
 
-  export(
-    spans: ReadableSpan[],
-    resultCallback: (result: ExportResult) => void,
-  ): void {
+  export(spans: ReadableSpan[], resultCallback: (result: ExportResult) => void): void {
     const payloads = spans.map(otelSpanToPayload);
     this.http
       .post(INGEST_PATH, { json: { spans: payloads } })

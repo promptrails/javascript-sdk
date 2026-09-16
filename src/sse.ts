@@ -68,9 +68,7 @@ function parseEvent(name: string, data: string): StreamEvent | null {
           type: "execution",
           executionId: parsed.execution_id,
           userMessageId:
-            typeof parsed.user_message_id === "string"
-              ? parsed.user_message_id
-              : undefined,
+            typeof parsed.user_message_id === "string" ? parsed.user_message_id : undefined,
         };
       }
       return null;
@@ -93,8 +91,7 @@ function parseEvent(name: string, data: string): StreamEvent | null {
           type: "tool_end",
           id: parsed.id,
           name: parsed.name,
-          summary:
-            typeof parsed.summary === "string" ? parsed.summary : undefined,
+          summary: typeof parsed.summary === "string" ? parsed.summary : undefined,
         };
       }
       return null;

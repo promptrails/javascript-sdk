@@ -30,28 +30,19 @@ export class TracesResource extends BaseResource {
    * `model_name`, `agent_id`, `session_id`, `execution_id` and similar query
    * parameters.
    */
-  async getSummary(
-    filters?: Record<string, string | number>,
-  ): Promise<TraceSummary> {
+  async getSummary(filters?: Record<string, string | number>): Promise<TraceSummary> {
     const body = await this.http.get("/api/v1/traces/summary", filters ?? {});
     return this.unwrap(body) as TraceSummary;
   }
 
   /** PII-masking report over a filtered set of traces. */
-  async piiReport(
-    filters?: Record<string, string | number>,
-  ): Promise<Record<string, unknown>> {
-    const body = await this.http.get(
-      "/api/v1/traces/pii-report",
-      filters ?? {},
-    );
+  async piiReport(filters?: Record<string, string | number>): Promise<Record<string, unknown>> {
+    const body = await this.http.get("/api/v1/traces/pii-report", filters ?? {});
     return this.unwrap(body) as Record<string, unknown>;
   }
 
   /** Ingest up to 1000 raw spans in one request. */
-  async ingest(
-    spans: Record<string, unknown>[],
-  ): Promise<Record<string, unknown>> {
+  async ingest(spans: Record<string, unknown>[]): Promise<Record<string, unknown>> {
     const body = await this.http.post("/api/v1/traces/ingest", { spans });
     return this.unwrap(body) as Record<string, unknown>;
   }

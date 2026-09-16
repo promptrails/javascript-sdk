@@ -11,9 +11,9 @@
  * await tracer.flush();
  */
 
-import { ClientOptions, resolveConfig } from "../config";
+import { type ClientOptions, resolveConfig } from "../config";
 import { HTTPClient } from "../http";
-import { ExporterOptions, SpanExporter } from "./exporter";
+import { type ExporterOptions, SpanExporter } from "./exporter";
 import { Span } from "./span";
 
 export interface TracerOptions extends Partial<ClientOptions>, ExporterOptions {

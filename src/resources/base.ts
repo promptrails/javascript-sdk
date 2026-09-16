@@ -1,4 +1,4 @@
-import { HTTPClient } from "../http";
+import type { HTTPClient } from "../http";
 
 export class BaseResource {
   protected http: HTTPClient;

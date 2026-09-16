@@ -36,17 +36,12 @@ export class ExecutionsResource extends BaseResource {
 
   /** Request cooperative cancellation of a running execution. */
   async cancel(executionId: string): Promise<AgentExecution> {
-    const body = await this.http.post(
-      `/api/v1/executions/${executionId}/cancel`,
-      {},
-    );
+    const body = await this.http.post(`/api/v1/executions/${executionId}/cancel`, {});
     return this.unwrap(body) as AgentExecution;
   }
 
   /** List executions parked at `waiting_approval`. */
-  async approvalInbox(
-    params?: ListParams,
-  ): Promise<PaginatedResponse<AgentExecution>> {
+  async approvalInbox(params?: ListParams): Promise<PaginatedResponse<AgentExecution>> {
     const body = await this.http.get("/api/v1/executions/approval-inbox", {
       page: params?.page ?? 1,
       limit: params?.limit ?? 20,
@@ -55,10 +50,7 @@ export class ExecutionsResource extends BaseResource {
   }
 
   /** Approve a run parked at `waiting_approval` and resume it. */
-  async approve(
-    executionId: string,
-    data?: { reason?: string },
-  ): Promise<AgentExecution> {
+  async approve(executionId: string, data?: { reason?: string }): Promise<AgentExecution> {
     const body = await this.http.post(
       `/api/v1/executions/${executionId}/approve`,
       (data ?? {}) as Record<string, unknown>,
@@ -67,10 +59,7 @@ export class ExecutionsResource extends BaseResource {
   }
 
   /** Deny a run parked at `waiting_approval` and resume with a denial. */
-  async deny(
-    executionId: string,
-    data?: { reason?: string },
-  ): Promise<AgentExecution> {
+  async deny(executionId: string, data?: { reason?: string }): Promise<AgentExecution> {
     const body = await this.http.post(
       `/api/v1/executions/${executionId}/deny`,
       (data ?? {}) as Record<string, unknown>,
@@ -87,13 +76,9 @@ export class ExecutionsResource extends BaseResource {
     executionId: string,
     options?: { signal?: AbortSignal },
   ): AsyncGenerator<StreamEvent> {
-    const response = await this.http.stream(
-      "GET",
-      `/api/v1/executions/${executionId}/stream`,
-      {
-        signal: options?.signal,
-      },
-    );
+    const response = await this.http.stream("GET", `/api/v1/executions/${executionId}/stream`, {
+      signal: options?.signal,
+    });
     yield* parseSSEStream(response, options?.signal);
   }
 }

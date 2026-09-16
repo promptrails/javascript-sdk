@@ -1,4 +1,4 @@
-import { HTTPClient } from "../src/http";
+import type { HTTPClient } from "../src/http";
 import { PromptsResource } from "../src/resources/prompts";
 
 const mockHttp = {
@@ -20,9 +20,7 @@ describe("PromptsResource", () => {
 
   it("should list prompts", async () => {
     (mockHttp.get as jest.Mock).mockResolvedValue({
-      data: [
-        { id: "p1", name: "Prompt 1", status: "active", workspace_id: "ws" },
-      ],
+      data: [{ id: "p1", name: "Prompt 1", status: "active", workspace_id: "ws" }],
       meta: { total: 1, page: 1, limit: 20, pages: 1 },
     });
 

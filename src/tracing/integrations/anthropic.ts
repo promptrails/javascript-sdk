@@ -13,8 +13,8 @@
  * Duck-typed: it patches `client.messages.create` and reads `model`/`usage`/
  * `content` off the response. */
 
-import { Span } from "../span";
-import { Tracer } from "../tracer";
+import type { Span } from "../span";
+import type { Tracer } from "../tracer";
 
 interface AnthropicUsage {
   input_tokens?: number;
@@ -62,15 +62,10 @@ export function traceAnthropic<T extends AnthropicLike>(
 
 function applyResponse(span: Span, response: AnthropicResponse): void {
   const usage = response.usage;
-  if (
-    usage &&
-    (usage.input_tokens !== undefined || usage.output_tokens !== undefined)
-  ) {
+  if (usage && (usage.input_tokens !== undefined || usage.output_tokens !== undefined)) {
     span.setUsage(usage.input_tokens, usage.output_tokens);
   }
   if (response.model) span.setModel(response.model);
-  const text = response.content?.find(
-    (block) => block?.text !== undefined,
-  )?.text;
+  const text = response.content?.find((block) => block?.text !== undefined)?.text;
   if (text !== undefined) span.setOutput({ content: text });
 }

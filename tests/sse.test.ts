@@ -22,10 +22,7 @@ function sseResponse(chunks: string[]): Response {
   });
 }
 
-async function collect(
-  response: Response,
-  signal?: AbortSignal,
-): Promise<StreamEvent[]> {
+async function collect(response: Response, signal?: AbortSignal): Promise<StreamEvent[]> {
   const events: StreamEvent[] = [];
   for await (const e of parseSSEStream(response, signal)) {
     events.push(e);
@@ -95,9 +92,7 @@ describe("parseSSEStream", () => {
   });
 
   it("maps error frames to error events", async () => {
-    const resp = sseResponse([
-      `event: error\ndata: {"message":"quota exceeded"}\n\n`,
-    ]);
+    const resp = sseResponse([`event: error\ndata: {"message":"quota exceeded"}\n\n`]);
     const events = await collect(resp);
     expect(events).toEqual([{ type: "error", message: "quota exceeded" }]);
   });
@@ -107,14 +102,10 @@ describe("parseSSEStream", () => {
     const ctrl = new AbortController();
     const stream = new ReadableStream<Uint8Array>({
       async start(controller) {
-        controller.enqueue(
-          encoder.encode(`event: content\ndata: {"content":"a"}\n\n`),
-        );
+        controller.enqueue(encoder.encode(`event: content\ndata: {"content":"a"}\n\n`));
         ctrl.abort();
         // queue a second chunk that should never be yielded
-        controller.enqueue(
-          encoder.encode(`event: content\ndata: {"content":"b"}\n\n`),
-        );
+        controller.enqueue(encoder.encode(`event: content\ndata: {"content":"b"}\n\n`));
         controller.close();
       },
     });

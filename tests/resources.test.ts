@@ -73,10 +73,7 @@ describe("AgentVFSResource", () => {
   it("list scopes to the agent vfs path", async () => {
     http.get.mockResolvedValue({ data: { path: "/", items: [], total: 0 } });
     await vfs.list("ag1");
-    expect(http.get).toHaveBeenCalledWith(
-      "/api/v1/agents/ag1/vfs",
-      expect.any(Object),
-    );
+    expect(http.get).toHaveBeenCalledWith("/api/v1/agents/ag1/vfs", expect.any(Object));
   });
 
   it("write PUTs the file endpoint with default overwrite mode", async () => {
@@ -120,10 +117,7 @@ describe("DataSourcesResource", () => {
   it("CRUD hits the data-sources endpoints", async () => {
     http.get.mockResolvedValue(listBody);
     await ds.list();
-    expect(http.get).toHaveBeenCalledWith(
-      "/api/v1/data-sources",
-      expect.any(Object),
-    );
+    expect(http.get).toHaveBeenCalledWith("/api/v1/data-sources", expect.any(Object));
 
     http.get.mockResolvedValue({ data: { id: "d1" } });
     await ds.get("d1");
@@ -131,10 +125,7 @@ describe("DataSourcesResource", () => {
 
     http.post.mockResolvedValue({ data: { id: "d1" } });
     await ds.create({ name: "x" } as never);
-    expect(http.post).toHaveBeenCalledWith(
-      "/api/v1/data-sources",
-      expect.any(Object),
-    );
+    expect(http.post).toHaveBeenCalledWith("/api/v1/data-sources", expect.any(Object));
 
     http.delete.mockResolvedValue({});
     await ds.delete("d1");
@@ -144,9 +135,7 @@ describe("DataSourcesResource", () => {
   it("testConnection posts to the test endpoint", async () => {
     http.post.mockResolvedValue({ data: { ok: true } });
     await ds.testConnection("d1");
-    expect(http.post.mock.calls[0][0]).toContain(
-      "/api/v1/data-sources/d1/test",
-    );
+    expect(http.post.mock.calls[0][0]).toContain("/api/v1/data-sources/d1/test");
   });
 });
 
@@ -202,10 +191,7 @@ describe("CredentialsResource", () => {
 
     http.get.mockResolvedValue(listBody);
     await creds.list();
-    expect(http.get).toHaveBeenCalledWith(
-      "/api/v1/credentials",
-      expect.any(Object),
-    );
+    expect(http.get).toHaveBeenCalledWith("/api/v1/credentials", expect.any(Object));
 
     http.post.mockResolvedValue({ data: { id: "c1" } });
     await creds.create({
@@ -213,10 +199,7 @@ describe("CredentialsResource", () => {
       provider: "openai",
       api_key: "sk",
     } as never);
-    expect(http.post).toHaveBeenCalledWith(
-      "/api/v1/credentials",
-      expect.any(Object),
-    );
+    expect(http.post).toHaveBeenCalledWith("/api/v1/credentials", expect.any(Object));
 
     http.delete.mockResolvedValue({});
     await creds.delete("c1");

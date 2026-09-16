@@ -13,8 +13,8 @@
  * Targets the unified `@google/genai` SDK (`client.models.generateContent`).
  * Duck-typed: it reads `usageMetadata` and `text` off the response. */
 
-import { Span } from "../span";
-import { Tracer } from "../tracer";
+import type { Span } from "../span";
+import type { Tracer } from "../tracer";
 
 interface GoogleUsage {
   promptTokenCount?: number;
@@ -28,10 +28,7 @@ interface GoogleResponse {
   usageMetadata?: GoogleUsage;
 }
 
-type GenerateFn = (params: {
-  model?: string;
-  contents?: unknown;
-}) => Promise<GoogleResponse>;
+type GenerateFn = (params: { model?: string; contents?: unknown }) => Promise<GoogleResponse>;
 
 interface GoogleLike {
   models: { generateContent: GenerateFn };
@@ -49,8 +46,7 @@ export function traceGoogle<T extends GoogleLike>(
   models.generateContent = (params) =>
     tracer.span(spanName, { kind: "llm" }, async (span) => {
       if (params.model) span.setModel(params.model);
-      if (params.contents !== undefined)
-        span.setInput({ contents: params.contents });
+      if (params.contents !== undefined) span.setInput({ contents: params.contents });
       const response = await original(params);
       applyResponse(span, response, params.model);
       return response;
@@ -59,22 +55,10 @@ export function traceGoogle<T extends GoogleLike>(
   return client;
 }
 
-function applyResponse(
-  span: Span,
-  response: GoogleResponse,
-  requestModel?: string,
-): void {
+function applyResponse(span: Span, response: GoogleResponse, requestModel?: string): void {
   const usage = response.usageMetadata;
-  if (
-    usage &&
-    (usage.promptTokenCount !== undefined ||
-      usage.candidatesTokenCount !== undefined)
-  ) {
-    span.setUsage(
-      usage.promptTokenCount,
-      usage.candidatesTokenCount,
-      usage.totalTokenCount,
-    );
+  if (usage && (usage.promptTokenCount !== undefined || usage.candidatesTokenCount !== undefined)) {
+    span.setUsage(usage.promptTokenCount, usage.candidatesTokenCount, usage.totalTokenCount);
   }
   const model = response.modelVersion ?? requestModel;
   if (model) span.setModel(model);

@@ -1,5 +1,5 @@
-import { PaginatedResponse, parsePaginatedResponse } from "../pagination";
-import { LLMModel, AvailableModelGroup } from "../types";
+import { type PaginatedResponse, parsePaginatedResponse } from "../pagination";
+import type { AvailableModelGroup, LLMModel } from "../types";
 
 import { BaseResource } from "./base";
 

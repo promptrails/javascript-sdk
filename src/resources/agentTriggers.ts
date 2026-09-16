@@ -1,10 +1,10 @@
-import { PaginatedResponse, parsePaginatedResponse } from "../pagination";
-import {
+import { type PaginatedResponse, parsePaginatedResponse } from "../pagination";
+import type {
   AgentTrigger,
   AgentTriggerCreateResponse,
   CreateAgentTriggerRequest,
-  UpdateAgentTriggerRequest,
   ListParams,
+  UpdateAgentTriggerRequest,
 } from "../types";
 
 import { BaseResource } from "./base";
@@ -32,9 +32,7 @@ export class AgentTriggersResource extends BaseResource {
     return this.unwrap(body) as AgentTrigger;
   }
 
-  async create(
-    data: CreateAgentTriggerRequest,
-  ): Promise<AgentTriggerCreateResponse> {
+  async create(data: CreateAgentTriggerRequest): Promise<AgentTriggerCreateResponse> {
     const body = await this.http.post(
       "/api/v1/triggers",
       data as unknown as Record<string, unknown>,
@@ -42,10 +40,7 @@ export class AgentTriggersResource extends BaseResource {
     return this.unwrap(body) as AgentTriggerCreateResponse;
   }
 
-  async update(
-    triggerId: string,
-    data: UpdateAgentTriggerRequest,
-  ): Promise<AgentTrigger> {
+  async update(triggerId: string, data: UpdateAgentTriggerRequest): Promise<AgentTrigger> {
     const body = await this.http.patch(
       `/api/v1/triggers/${triggerId}`,
       data as unknown as Record<string, unknown>,

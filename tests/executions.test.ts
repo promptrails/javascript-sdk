@@ -77,10 +77,7 @@ describe("ExecutionsResource", () => {
 
     const exec = await executions.cancel("e1");
     expect(exec.status).toBe("cancel_requested");
-    expect(mockHttp.post).toHaveBeenCalledWith(
-      "/api/v1/executions/e1/cancel",
-      {},
-    );
+    expect(mockHttp.post).toHaveBeenCalledWith("/api/v1/executions/e1/cancel", {});
   });
 
   it("should list the approval inbox", async () => {
@@ -91,13 +88,10 @@ describe("ExecutionsResource", () => {
 
     const result = await executions.approvalInbox();
     expect(result.data).toHaveLength(1);
-    expect(mockHttp.get).toHaveBeenCalledWith(
-      "/api/v1/executions/approval-inbox",
-      {
-        page: 1,
-        limit: 20,
-      },
-    );
+    expect(mockHttp.get).toHaveBeenCalledWith("/api/v1/executions/approval-inbox", {
+      page: 1,
+      limit: 20,
+    });
   });
 
   it("should approve and deny a parked execution", async () => {
@@ -106,17 +100,11 @@ describe("ExecutionsResource", () => {
     });
 
     await executions.approve("e1", { reason: "ok" });
-    expect(mockHttp.post).toHaveBeenCalledWith(
-      "/api/v1/executions/e1/approve",
-      {
-        reason: "ok",
-      },
-    );
+    expect(mockHttp.post).toHaveBeenCalledWith("/api/v1/executions/e1/approve", {
+      reason: "ok",
+    });
 
     await executions.deny("e1");
-    expect(mockHttp.post).toHaveBeenCalledWith(
-      "/api/v1/executions/e1/deny",
-      {},
-    );
+    expect(mockHttp.post).toHaveBeenCalledWith("/api/v1/executions/e1/deny", {});
   });
 });

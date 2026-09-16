@@ -13,8 +13,8 @@
  * dependency on `@langchain/core`). The span tree is built from
  * `runId`/`parentRunId`, so it is correct under concurrent runs. */
 
-import { Span } from "../span";
-import { Tracer } from "../tracer";
+import type { Span } from "../span";
+import type { Tracer } from "../tracer";
 
 interface Serialized {
   name?: string;
@@ -66,12 +66,7 @@ export class PromptRailsCallbackHandler {
 
   // -- chains ----------------------------------------------------------
 
-  handleChainStart(
-    chain: Serialized,
-    inputs: unknown,
-    runId: string,
-    parentRunId?: string,
-  ): void {
+  handleChainStart(chain: Serialized, inputs: unknown, runId: string, parentRunId?: string): void {
     this.start(runId, parentRunId, nameOf(chain, "chain"), "chain", inputs);
   }
   handleChainEnd(outputs: unknown, runId: string): void {
@@ -118,12 +113,7 @@ export class PromptRailsCallbackHandler {
 
   // -- tools -----------------------------------------------------------
 
-  handleToolStart(
-    tool: Serialized,
-    input: string,
-    runId: string,
-    parentRunId?: string,
-  ): void {
+  handleToolStart(tool: Serialized, input: string, runId: string, parentRunId?: string): void {
     this.start(runId, parentRunId, nameOf(tool, "tool"), "tool", { input });
   }
   handleToolEnd(output: unknown, runId: string): void {
@@ -141,13 +131,7 @@ export class PromptRailsCallbackHandler {
     runId: string,
     parentRunId?: string,
   ): void {
-    this.start(
-      runId,
-      parentRunId,
-      nameOf(retriever, "retriever"),
-      "datasource",
-      { query },
-    );
+    this.start(runId, parentRunId, nameOf(retriever, "retriever"), "datasource", { query });
   }
   handleRetrieverEnd(documents: unknown[], runId: string): void {
     this.finish(runId, {
@@ -181,24 +165,15 @@ function nameOf(serialized: Serialized | undefined, fallback: string): string {
 }
 
 function applyModel(span: Span, extraParams?: Record<string, unknown>): void {
-  const invocation = extraParams?.invocation_params as
-    | Record<string, unknown>
-    | undefined;
+  const invocation = extraParams?.invocation_params as Record<string, unknown> | undefined;
   const model = invocation?.model ?? invocation?.model_name;
   if (typeof model === "string") span.setModel(model);
 }
 
 function applyLLMOutput(span: Span, output: LLMResult): void {
   const usage = output.llmOutput?.tokenUsage;
-  if (
-    usage &&
-    (usage.promptTokens !== undefined || usage.completionTokens !== undefined)
-  ) {
-    span.setUsage(
-      usage.promptTokens,
-      usage.completionTokens,
-      usage.totalTokens,
-    );
+  if (usage && (usage.promptTokens !== undefined || usage.completionTokens !== undefined)) {
+    span.setUsage(usage.promptTokens, usage.completionTokens, usage.totalTokens);
   }
   if (output.llmOutput?.modelName) span.setModel(output.llmOutput.modelName);
 }
