@@ -182,7 +182,8 @@ function nameOf(serialized: Serialized | undefined, fallback: string): string {
 
 function applyModel(span: Span, extraParams?: Record<string, unknown>): void {
   const invocation = extraParams?.invocation_params as
-    Record<string, unknown> | undefined;
+    | Record<string, unknown>
+    | undefined;
   const model = invocation?.model ?? invocation?.model_name;
   if (typeof model === "string") span.setModel(model);
 }

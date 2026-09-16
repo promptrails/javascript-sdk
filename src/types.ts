@@ -722,7 +722,12 @@ export interface A2AAgentCard {
 
 // Webhook Trigger types
 export type AgentTriggerSource =
-  "generic" | "slack" | "telegram" | "whatsapp" | "teams" | "schedule";
+  | "generic"
+  | "slack"
+  | "telegram"
+  | "whatsapp"
+  | "teams"
+  | "schedule";
 
 export interface AgentTrigger {
   id: string;
