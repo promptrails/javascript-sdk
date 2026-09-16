@@ -69,8 +69,8 @@ can be auto-instrumented — see [integrations](docs/integrations.md).
 
 ```bash
 npm ci            # install dependencies
-npm run lint      # lint
-npm run format    # format
+npm run check     # lint + format + import order (Biome)
+npm run check:fix # ...and fix what can be fixed
 npm run build     # build (ESM + CJS)
 npm test          # test
 ```
