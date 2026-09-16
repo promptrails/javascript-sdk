@@ -75,7 +75,7 @@
     "node": ">=18.0.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.5.14",
+    "@biomejs/biome": "2.5.14",
     "@types/jest": "^30.0.0",
     "jest": "^30.5.1",
     "ts-jest": "^29.1.0",
